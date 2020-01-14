@@ -19,11 +19,13 @@ class JWTAuthentication(authentication.BaseAuthentication):
     www_authenticate_realm = 'api'
 
     def authenticate(self, request):
+        print('cool')
         header = self.get_header(request)
         if header is None:
             return None
 
         raw_token = self.get_raw_token(header)
+        print(raw_token)
         if raw_token is None:
             return None
 
@@ -32,7 +34,7 @@ class JWTAuthentication(authentication.BaseAuthentication):
             backend = backend_class.make_instance_from_raw_jwt(raw_token)
             try:
                 payload = backend.decode(token=raw_token, verify=True)
-                return payload
+                return None, payload
             except JWTBackendError:
                 raise AuthenticationFailed('Token verification failed, token is invalid or has expired')
         raise AuthenticationFailed('No matching backend found for token')

@@ -3,7 +3,7 @@ from django.utils import timezone
 
 
 DEFAULT_SETTINGS = {
-    'ACCESS_TOKEN_LIFETIME': timezone.timedelta(minutes=5),
+    'ACCESS_TOKEN_LIFETIME': timezone.timedelta(minutes=30),
     'REFRESH_TOKEN_LIFETIME': timezone.timedelta(days=1),
     'BLACKLIST_AFTER_ROTATION': True,
 
