@@ -1,0 +1,2 @@
+class JWTBackendError(Exception):
+    pass

@@ -1,0 +1,1 @@
+from .api_key_views import APIKeyObtainJWTAccessTokenView # noqa

@@ -1,0 +1,10 @@
+#
+#
+# Dependencies for development.
+#
+#
+-r common.txt
+
+# For database fixture generation
+model-mommy==1.5.1
+django-dbdev==1.2.3
