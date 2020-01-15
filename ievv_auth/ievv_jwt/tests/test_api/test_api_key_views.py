@@ -1,4 +1,5 @@
 from django import test
+from django.utils import timezone
 
 from ievv_auth.ievv_api_key.models import ScopedAPIKey
 from ievv_auth.ievv_jwt.api.views import APIKeyObtainJWTAccessTokenView
@@ -32,6 +33,28 @@ class TestAPIKeyObtainJWTAccessTokenView(test.TestCase, api_test_mixin.ApiTestMi
         response = self.make_post_request(data={'api_key': api_key})
         self.assertEqual(response.status_code, 401)
         self.assertEqual(response.data.get('detail'), 'Unknown jwt backend could not authenticate')
+
+    def test_api_key_revoked(self):
+        api_key, instance = ScopedAPIKey.objects.create_key(
+            name='test',
+            jwt_backend_name='crazy',
+        )
+        instance.revoked = True
+        instance.save()
+        response = self.make_post_request(data={'api_key': api_key})
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.data.get('detail'), 'Api key has expired or is invalid')
+
+    def test_api_key_expired(self):
+        api_key, instance = ScopedAPIKey.objects.create_key(
+            name='test',
+            jwt_backend_name='crazy',
+        )
+        instance.expiration_datetime = timezone.now()
+        instance.save()
+        response = self.make_post_request(data={'api_key': api_key})
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.data.get('detail'), 'Api key has expired or is invalid')
 
     def test_api_key_ok_api_key_backend(self):
         api_key, instance = ScopedAPIKey.objects.create_key(
