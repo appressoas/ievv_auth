@@ -5,8 +5,8 @@ from ievv_auth.ievv_jwt.backends.backend_registry import get_backend_from_raw_jw
 from ievv_auth.ievv_jwt.exceptions import JWTBackendError
 from ievv_auth.ievv_jwt.utils.load_settings import load_global_settings
 
-ievv_jwt_globa_settings = load_global_settings()
-AUTH_HEADER_TYPES = ievv_jwt_globa_settings['AUTH_HEADER_TYPES']
+ievv_jwt_global_settings = load_global_settings()
+AUTH_HEADER_TYPES = ievv_jwt_global_settings['AUTH_HEADER_TYPES']
 
 AUTH_HEADER_TYPE_BYTES = set(
     h.encode(HTTP_HEADER_ENCODING)
