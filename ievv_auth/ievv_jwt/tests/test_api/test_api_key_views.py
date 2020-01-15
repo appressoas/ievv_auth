@@ -3,6 +3,7 @@ from django.utils import timezone
 
 from ievv_auth.ievv_api_key.models import ScopedAPIKey
 from ievv_auth.ievv_jwt.api.views import APIKeyObtainJWTAccessTokenView
+from ievv_auth.ievv_jwt.backends.api_key_backend import ApiKeyBackend
 from ievv_auth.ievv_jwt.tests.test_api import api_test_mixin
 
 
@@ -60,8 +61,14 @@ class TestAPIKeyObtainJWTAccessTokenView(test.TestCase, api_test_mixin.ApiTestMi
         api_key, instance = ScopedAPIKey.objects.create_key(
             name='test',
             jwt_backend_name='api-key',
+            base_jwt_payload={
+                'scope': 'cool'
+            }
         )
         response = self.make_post_request(data={'api_key': api_key})
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.data.get('access'))
-
+        payload = ApiKeyBackend().decode(token=response.data.get('access'), verify=True)
+        self.assertEqual(payload['scope'], 'cool')
+        self.assertEqual(payload['api_key_id'], instance.id)
+        self.assertEqual(payload['jwt_backend_name'], 'api-key')

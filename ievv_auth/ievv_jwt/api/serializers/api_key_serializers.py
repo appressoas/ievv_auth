@@ -16,8 +16,7 @@ class ApiKeyObtainJWTSerializer(serializers.Serializer):
         is_valid, instance = ScopedAPIKey.objects.is_valid_with_logging(
             api_key=attrs['api_key'],
             extra={
-                'ip': client_ip,
-                'publicly_routable': is_routable
+                'ip': client_ip
             }
         )
         if not is_valid or not instance:
