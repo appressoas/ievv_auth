@@ -39,7 +39,7 @@ class MyAppConfig(AppConfig):
 
     def ready(self):
         from ievv_auth.ievv_jwt.backends.backend_registry import JWTBackendRegistry
-        from my_project.my_app.jwt_backends from CustomJWTBackend 
+        from my_project.my_app.jwt_backends import CustomJWTBackend 
         registry = JWTBackendRegistry.get_instance()
         registry.set_backend(CustomJWTBackend)
 ```
