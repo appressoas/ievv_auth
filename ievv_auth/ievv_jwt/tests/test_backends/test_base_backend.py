@@ -1,16 +1,13 @@
 import base64
 import json
+from calendar import timegm
 from unittest import mock
-from unittest.mock import patch, PropertyMock
+from unittest.mock import PropertyMock
 
 import jwt as py_jwt
-from calendar import timegm
-from django.utils import timezone
-from model_mommy import mommy
-
 from django.test import TestCase
+from django.utils import timezone
 
-from ievv_auth.ievv_jwt.backends.api_key_backend import ApiKeyBackend
 from ievv_auth.ievv_jwt.backends.base_backend import BaseBackend
 from ievv_auth.ievv_jwt.exceptions import JWTBackendError
 
@@ -80,42 +77,3 @@ class TestBaseBackend(TestCase):
                 jwt = backend.encode()
                 with self.assertRaisesMessage(JWTBackendError, 'Token is invalid or expired'):
                     backend.decode(jwt, verify=True)
-
-
-class TestApiKeyBackend(TestCase):
-
-    def test_sanity(self):
-        api_key = mommy.make(
-            'ievv_api_key.ScopedApiKey',
-            base_jwt_payload={
-                'scope': ['read', 'write']
-            }
-        )
-        backend = ApiKeyBackend(api_key_id=api_key.id)
-        jwt = backend.encode()
-        decoded = backend.decode(jwt)
-        self.assertIn('exp', decoded)
-        self.assertIn('iat', decoded)
-        self.assertIn('jti', decoded)
-        self.assertEqual(decoded['api_key_id'], api_key.id)
-        self.assertEqual(decoded['scope'], ['read', 'write'])
-
-    def test_fields_which_is_not_overridable_is_not_changed(self):
-        api_key = mommy.make(
-            'ievv_api_key.ScopedApiKey',
-            base_jwt_payload={
-                'exp': 123,
-                'iat': 123,
-                'jti': 123
-            }
-        )
-        backend = ApiKeyBackend(api_key_id=api_key.id)
-        jwt = backend.encode()
-        decoded = backend.decode(jwt)
-        self.assertIn('exp', decoded)
-        self.assertNotEqual(decoded['exp'], 123)
-        self.assertIn('iat', decoded)
-        self.assertNotEqual(decoded['iat'], 123)
-        self.assertIn('jti', decoded)
-        self.assertNotEqual(decoded['jti'], 123)
-        self.assertEqual(decoded['api_key_id'], api_key.id)

@@ -6,7 +6,7 @@ with open(os.path.join(os.path.dirname(__file__), 'ievv_auth', 'version.json')) 
     version = json.loads(f.read())
 
 setup(
-    name='ievv_auth',
+    name='ievv-auth',
     description='The ievv_auth django project.',
     version=version,
     author='ievv',
