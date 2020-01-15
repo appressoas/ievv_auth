@@ -19,7 +19,8 @@ setup(
         'Django',
         'PyJWT>=1.7.1',
         'djangorestframework',
-        'psycopg2'
+        'psycopg2',
+        'django-ipware'
     ],
     include_package_data=True,
     zip_safe=False,

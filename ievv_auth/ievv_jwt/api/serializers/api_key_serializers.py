@@ -1,3 +1,4 @@
+from ipware import get_client_ip
 from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed
 
@@ -10,14 +11,24 @@ class ApiKeyObtainJWTSerializer(serializers.Serializer):
     api_key = serializers.CharField()
 
     def validate(self, attrs):
-        is_valid, instance = ScopedAPIKey.objects.is_valid_with_logging(api_key=attrs['api_key'])
-        if not is_valid:
+        request = self.context.get("request")
+        client_ip, is_routable = get_client_ip(request)
+        is_valid, instance = ScopedAPIKey.objects.is_valid_with_logging(
+            api_key=attrs['api_key'],
+            extra={
+                'ip': client_ip,
+                'publicly_routable': is_routable
+            }
+        )
+        if not is_valid or not instance:
             raise AuthenticationFailed('Api key has expired or is invalid')
         jwt_backend_class = JWTBackendRegistry.get_instance().get_backend(instance.jwt_backend_name)
         if not jwt_backend_class:
             raise AuthenticationFailed('Unknown jwt backend could not authenticate')
-        try:
-            backend = jwt_backend_class(api_key_id=instance.id)
-        except JWTBackendError:
-            raise AuthenticationFailed('Api key is invalid')
-        return backend.make_authenticate_success_response()
+        backend = jwt_backend_class()
+        return backend.make_authenticate_success_response(
+            base_payload={
+                **instance.base_jwt_payload,
+                'api_key_id': instance.id
+            }
+        )

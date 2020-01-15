@@ -67,8 +67,11 @@ class AbstractBackend:
     def jti(self):
         return uuid4().hex
 
-    def make_payload(self):
-        payload = {}
+    def make_payload(self, base_payload=None):
+        if not base_payload:
+            payload = {}
+        else:
+            payload = base_payload
         if self.audience:
             payload['aud'] = self.audience
 
@@ -84,8 +87,12 @@ class AbstractBackend:
         payload['jwt_backend_name'] = self.__class__.get_backend_name()
         return payload
 
-    def encode(self):
-        token = jwt.encode(self.make_payload(), self.signing_key, algorithm=self.algorithm)
+    def encode(self, base_payload=None):
+        token = jwt.encode(
+            self.make_payload(base_payload=base_payload),
+            self.signing_key,
+            algorithm=self.algorithm
+        )
         return token.decode('utf-8')
 
     def decode(self, token, verify=True):
