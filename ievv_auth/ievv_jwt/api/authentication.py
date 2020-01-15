@@ -1,4 +1,3 @@
-import jwt
 from rest_framework import HTTP_HEADER_ENCODING, authentication
 from rest_framework.exceptions import AuthenticationFailed
 
@@ -19,13 +18,11 @@ class JWTAuthentication(authentication.BaseAuthentication):
     www_authenticate_realm = 'api'
 
     def authenticate(self, request):
-        print('cool')
         header = self.get_header(request)
         if header is None:
             return None
 
         raw_token = self.get_raw_token(header)
-        print(raw_token)
         if raw_token is None:
             return None
 
