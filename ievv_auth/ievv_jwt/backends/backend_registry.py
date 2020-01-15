@@ -12,7 +12,7 @@ class JWTBackendRegistry(Singleton):
         self._backend_map[backend.get_backend_name()] = backend
 
     def get_backend(self, backend_name):
-        return self._backend_map[backend_name]
+        return self._backend_map.get(backend_name, None)
 
     def get_backend_choices(self):
         choices = []
