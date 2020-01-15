@@ -14,6 +14,7 @@ setup(
     author_email='post@appresso.no',
     packages=find_packages(exclude=['manage']),
     license='BSD',
+    url="https://github.com/appressoas/ievv_auth",
     install_requires=[
         'Django',
         'PyJWT>=1.7.1',
@@ -23,7 +24,7 @@ setup(
     include_package_data=True,
     zip_safe=False,
     classifiers=[
-        'Development Status :: 1 - Beta',
+        'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
         'Framework :: Django',
         'Intended Audience :: Developers',
