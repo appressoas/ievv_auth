@@ -4,7 +4,7 @@ from django import test
 from model_mommy import mommy
 from unittest.mock import MagicMock, patch
 
-from ievv_auth.ievv_api_key.models import ScopedAPIKey
+from ievv_auth.ievv_api_key.models import ScopedAPIKey, AuthenticationLog
 
 
 class TestScopedApiKey(test.TestCase):
@@ -36,10 +36,10 @@ class TestScopedApiKey(test.TestCase):
         is_valid, instance = ScopedAPIKey.objects.is_valid_with_logging(api_key=api_key)
         self.assertTrue(is_valid)
         instance.refresh_from_db()
-        self.assertEqual(
-            instance.authentication_log[0]['message'],
-            'Authentication successful'
-        )
+        self.assertEqual(AuthenticationLog.objects.count(), 1)
+        log = AuthenticationLog.objects.first()
+        self.assertEqual(log.api_key.id, instance.id)
+        self.assertEqual(log.log_data.get('message'), 'Authentication successful')
 
     def test_api_key_revoked_with_logging(self):
         api_key, instance = ScopedAPIKey.objects.create_key()
@@ -47,11 +47,10 @@ class TestScopedApiKey(test.TestCase):
         instance.save()
         is_valid, instance = ScopedAPIKey.objects.is_valid_with_logging(api_key=api_key)
         self.assertFalse(is_valid)
-        instance.refresh_from_db()
-        self.assertEqual(
-            instance.authentication_log[0]['message'],
-            'Authentication failed, key has been revoked'
-        )
+        self.assertEqual(AuthenticationLog.objects.count(), 1)
+        log = AuthenticationLog.objects.first()
+        self.assertEqual(log.api_key.id, instance.id)
+        self.assertEqual(log.log_data.get('message'), 'Authentication failed, key has been revoked')
 
     def test_api_key_expired_with_logging(self):
         with patch.object(ScopedAPIKey.objects, 'make_expiration_datetime',
@@ -59,11 +58,11 @@ class TestScopedApiKey(test.TestCase):
             api_key, instance = ScopedAPIKey.objects.create_key()
             is_valid, instance = ScopedAPIKey.objects.is_valid_with_logging(api_key=api_key)
             self.assertFalse(is_valid)
-            instance.refresh_from_db()
-            self.assertEqual(
-                instance.authentication_log[0]['message'],
-                'Authentication failed, key has expired'
-            )
+            self.assertEqual(AuthenticationLog.objects.count(), 1)
+            log = AuthenticationLog.objects.first()
+            self.assertEqual(log.api_key.id, instance.id)
+            self.assertEqual(log.log_data.get('message'), 'Authentication failed, key has expired')
+
 
     def test_should_not_be_able_to_set_revoked_to_false_after_being_true(self):
         api_key, instance = ScopedAPIKey.objects.create_key()

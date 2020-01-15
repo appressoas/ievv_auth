@@ -1,6 +1,10 @@
+import json
+
 from django.contrib import admin, messages
 from django import forms
-from ievv_auth.ievv_api_key.models import ScopedAPIKey
+from django.utils.html import format_html
+
+from ievv_auth.ievv_api_key.models import ScopedAPIKey, AuthenticationLog
 from ievv_auth.ievv_jwt.backends.backend_registry import JWTBackendRegistry
 
 
@@ -39,7 +43,6 @@ class ScopedAPIKeyAdmin(admin.ModelAdmin):
         'hashed_key',
         'created',
         'expiration_datetime',
-        'authentication_log'
     ]
     fields = [
         'prefix',
@@ -47,7 +50,6 @@ class ScopedAPIKeyAdmin(admin.ModelAdmin):
         'revoked',
         'created',
         'expiration_datetime',
-        'authentication_log',
         'jwt_backend_name',
         'base_jwt_payload'
     ]
@@ -67,3 +69,32 @@ class ScopedAPIKeyAdmin(admin.ModelAdmin):
                 base_jwt_payload=obj.base_jwt_payload
             )
             messages.add_message(request, messages.SUCCESS, f'Api key created: {api_key}')
+
+
+@admin.register(AuthenticationLog)
+class ScopedAPIKeyAdmin(admin.ModelAdmin):
+
+    list_display = [
+        'api_key',
+        'created',
+    ]
+
+    readonly_fields = [
+        'api_key',
+        'created',
+        'get_log_data_pretty',
+    ]
+    fields = [
+        'api_key',
+        'created',
+        'get_log_data_pretty',
+    ]
+
+    search_fields = [
+        'api_key__name',
+    ]
+
+    def get_log_data_pretty(self, obj):
+        return format_html('<pre>{}</pre>', json.dumps(obj.log_data or {}, indent=2, sort_keys=True))
+
+    get_log_data_pretty.short_description = 'Log data pretty'

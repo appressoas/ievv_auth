@@ -1,6 +1,7 @@
 import re
 from django.conf import settings
 from django.contrib.postgres import fields as pg_fields
+from django.contrib.postgres.fields import JSONField
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.db import models
@@ -147,12 +148,8 @@ class BaseAPIKeyManager(models.Manager):
         instance, valid, message = self._is_valid(api_key=api_key)
 
         if instance:
-            instance.authentication_log.append({
-                'message': message,
-                'datetime': timezone.now().isoformat(),
-                **extra
-            })
-            instance.save()
+            extra.update({'message': message})
+            instance.log_authentication_attempt(extra)
         return valid, instance
 
 
@@ -206,13 +203,6 @@ class AbstractAPIKey(models.Model):
         editable=False
     )
 
-    #: Authentication log contains entries of authentication tries and message
-    authentication_log = pg_fields.JSONField(
-        default=list,
-        blank=True,
-        null=False
-    )
-
     def __init__(self, *args, **kwargs):
         super(AbstractAPIKey, self).__init__(*args, **kwargs)
         self._initial_revoked = self.revoked
@@ -221,6 +211,9 @@ class AbstractAPIKey(models.Model):
         abstract = True
         verbose_name = ugettext_lazy('API key')
         verbose_name_plural = ugettext_lazy('API keys')
+
+    def log_authentication_attempt(self, log_data):
+        raise NotImplementedError('Please implement logging_model_class')
 
     @property
     def has_expired(self):
@@ -259,3 +252,20 @@ class ScopedAPIKey(AbstractAPIKey):
     class Meta:
         verbose_name = ugettext_lazy('Scoped api key')
         verbose_name_plural = ugettext_lazy('Scoped api keys')
+
+    def log_authentication_attempt(self, log_data):
+        AuthenticationLog.objects.create(api_key=self, log_data=log_data)
+
+    def __str__(self):
+        return f'{self.name} - id<{self.id}>'
+
+
+class AuthenticationLog(models.Model):
+    #: The instance of ScopedAPIKey this log belongs to.
+    api_key = models.ForeignKey(to=ScopedAPIKey, on_delete=models.CASCADE)
+
+    #: Log data contains authentication attempt message and auxiliary data
+    log_data = JSONField(null=True, blank=False, default=dict)
+
+    #: created datetime
+    created = models.DateTimeField(auto_now_add=True)
