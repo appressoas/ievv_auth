@@ -22,8 +22,11 @@ class TestApiKeyBackend(TestCase):
                 'scope': ['read', 'write']
             }
         )
-        backend = ApiKeyBackend(api_key_id=api_key.id)
-        jwt = backend.encode()
+        backend = ApiKeyBackend()
+        jwt = backend.encode(base_payload={
+            **api_key.base_jwt_payload,
+            'api_key_id': api_key.id
+        })
         decoded = backend.decode(jwt)
         self.assertIn('exp', decoded)
         self.assertIn('iat', decoded)
@@ -40,8 +43,11 @@ class TestApiKeyBackend(TestCase):
                 'jti': 123
             }
         )
-        backend = ApiKeyBackend(api_key_id=api_key.id)
-        jwt = backend.encode()
+        backend = ApiKeyBackend()
+        jwt = backend.encode(base_payload={
+            **api_key.base_jwt_payload,
+            'api_key_id': api_key.id
+        })
         decoded = backend.decode(jwt)
         self.assertIn('exp', decoded)
         self.assertNotEqual(decoded['exp'], 123)
@@ -58,8 +64,11 @@ class TestApiKeyBackend(TestCase):
                 'scope': ['read', 'write']
             }
         )
-        backend = ApiKeyBackend(api_key_id=api_key.id)
-        jwt = backend.encode()
+        backend = ApiKeyBackend()
+        jwt = backend.encode(base_payload={
+            **api_key.base_jwt_payload,
+            'api_key_id': api_key.id
+        })
         [header, _, secret] = jwt.split('.')
         decoded = backend.decode(jwt)
         decoded['exp'] = timegm((timezone.now() + timezone.timedelta(weeks=200)).utctimetuple())
@@ -80,8 +89,11 @@ class TestApiKeyBackend(TestCase):
                 'scope': ['read', 'write']
             }
         )
-        backend = ApiKeyBackend(api_key_id=api_key.id)
-        jwt = backend.encode()
+        backend = ApiKeyBackend()
+        jwt = backend.encode(base_payload={
+            **api_key.base_jwt_payload,
+            'api_key_id': api_key.id
+        })
         [header, _, secret] = jwt.split('.')
         decoded = backend.decode(jwt)
         decoded['scope'] = 'admin'
@@ -102,8 +114,11 @@ class TestApiKeyBackend(TestCase):
                 'scope': ['read', 'write']
             }
         )
-        backend = ApiKeyBackend(api_key_id=api_key.id)
-        jwt = backend.encode()
+        backend = ApiKeyBackend()
+        jwt = backend.encode(base_payload={
+            **api_key.base_jwt_payload,
+            'api_key_id': api_key.id
+        })
         decoded = backend.decode(jwt)
         new_jwt = py_jwt.encode(payload=decoded, key='asdxxxxxxxxxxxxxxxxxxxxxxxxxxx')
         with self.assertRaisesMessage(JWTBackendError, 'Token is invalid or expired'):
@@ -125,8 +140,11 @@ class TestApiKeyBackend(TestCase):
                         'scope': ['read', 'write']
                     }
                 )
-                backend = ApiKeyBackend(api_key_id=api_key.id)
-                jwt = backend.encode()
+                backend = ApiKeyBackend()
+                jwt = backend.encode(base_payload={
+                    **api_key.base_jwt_payload,
+                    'api_key_id': api_key.id
+                })
                 with self.assertRaisesMessage(JWTBackendError, 'Token is invalid or expired'):
                     backend.decode(jwt, verify=True)
 
@@ -137,23 +155,13 @@ class TestApiKeyBackend(TestCase):
                 'scope': ['read', 'write']
             }
         )
-        backend = ApiKeyBackend(api_key_id=api_key.id)
-        jwt = backend.encode()
+        backend = ApiKeyBackend()
+        jwt = backend.encode(base_payload={
+            **api_key.base_jwt_payload,
+            'api_key_id': api_key.id
+        })
         backend_instance = ApiKeyBackend.make_instance_from_raw_jwt(raw_jwt=jwt)
         self.assertIsInstance(backend_instance, ApiKeyBackend)
-
-    def test_make_instance_from_raw_jwt_api_key_id_does_not_exists(self):
-        api_key = mommy.make(
-            'ievv_api_key.ScopedApiKey',
-            base_jwt_payload={
-                'scope': ['read', 'write']
-            }
-        )
-        backend = ApiKeyBackend(api_key_id=api_key.id)
-        jwt = backend.encode()
-        api_key.delete()
-        with self.assertRaisesMessage(JWTBackendError, 'API key is not valid'):
-            ApiKeyBackend.make_instance_from_raw_jwt(raw_jwt=jwt)
 
     def test_make_authenticate_success_response(self):
         with mock.patch(
@@ -166,5 +174,11 @@ class TestApiKeyBackend(TestCase):
                     'scope': ['read', 'write']
                 }
             )
-            backend = ApiKeyBackend(api_key_id=api_key.id)
-            self.assertDictEqual(backend.make_authenticate_success_response(), {'access': 'test'})
+            backend = ApiKeyBackend()
+            self.assertDictEqual(
+                backend.make_authenticate_success_response(
+                    base_payload={
+                        **api_key.base_jwt_payload
+                    }),
+                {'access': 'test'}
+            )
