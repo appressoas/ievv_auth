@@ -4,7 +4,7 @@ from django.contrib import admin, messages
 from django import forms
 from django.utils.html import format_html
 
-from ievv_auth.ievv_api_key.models import ScopedAPIKey, AuthenticationLog
+from ievv_auth.ievv_api_key.models import ScopedAPIKey, ScopedApiKeyAuthenticationLog
 from ievv_auth.ievv_jwt.backends.backend_registry import JWTBackendRegistry
 
 
@@ -71,8 +71,8 @@ class ScopedAPIKeyAdmin(admin.ModelAdmin):
             messages.add_message(request, messages.SUCCESS, f'Api key created: {api_key}')
 
 
-@admin.register(AuthenticationLog)
-class ScopedAPIKeyAdmin(admin.ModelAdmin):
+@admin.register(ScopedApiKeyAuthenticationLog)
+class ScopedApiKeyAuthenticationLogAdmin(admin.ModelAdmin):
 
     list_display = [
         'api_key',

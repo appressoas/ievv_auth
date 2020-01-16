@@ -254,18 +254,23 @@ class ScopedAPIKey(AbstractAPIKey):
         verbose_name_plural = ugettext_lazy('Scoped api keys')
 
     def log_authentication_attempt(self, log_data):
-        AuthenticationLog.objects.create(api_key=self, log_data=log_data)
+        ScopedApiKeyAuthenticationLog.objects.create(api_key=self, log_data=log_data)
 
     def __str__(self):
         return f'{self.name} - id<{self.id}>'
 
 
-class AuthenticationLog(models.Model):
-    #: The instance of ScopedAPIKey this log belongs to.
-    api_key = models.ForeignKey(to=ScopedAPIKey, on_delete=models.CASCADE)
-
+class AbstractAuthenticationLog(models.Model):
     #: Log data contains authentication attempt message and auxiliary data
     log_data = JSONField(null=True, blank=False, default=dict)
 
     #: created datetime
     created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        abstract = True
+
+
+class ScopedApiKeyAuthenticationLog(AbstractAuthenticationLog):
+    #: The instance of ScopedAPIKey this log belongs to.
+    api_key = models.ForeignKey(to=ScopedAPIKey, on_delete=models.CASCADE)
