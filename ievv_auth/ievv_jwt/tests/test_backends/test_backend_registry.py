@@ -7,7 +7,7 @@ from unittest.mock import PropertyMock
 import jwt as py_jwt
 from django.test import TestCase
 from django.utils import timezone
-from model_mommy import mommy
+from model_bakery import baker
 
 from ievv_auth.ievv_jwt.backends.api_key_backend import ApiKeyBackend
 from ievv_auth.ievv_jwt.backends.backend_registry import JWTBackendRegistry, get_backend_from_raw_jwt
@@ -31,7 +31,7 @@ class TestJWTBackendRegistry(TestCase):
         self.assertIsNone(backend_class)
 
     def test_get_backend_from_raw_jwt(self):
-        api_key = mommy.make(
+        api_key = baker.make(
             'ievv_api_key.ScopedApiKey',
             base_jwt_payload={
                 'scope': ['read', 'write']

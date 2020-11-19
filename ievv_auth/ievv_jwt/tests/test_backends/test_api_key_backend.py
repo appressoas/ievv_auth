@@ -7,7 +7,7 @@ from unittest.mock import PropertyMock
 import jwt as py_jwt
 from django.test import TestCase
 from django.utils import timezone
-from model_mommy import mommy
+from model_bakery import baker
 
 from ievv_auth.ievv_jwt.backends.api_key_backend import ApiKeyBackend
 from ievv_auth.ievv_jwt.exceptions import JWTBackendError
@@ -16,7 +16,7 @@ from ievv_auth.ievv_jwt.exceptions import JWTBackendError
 class TestApiKeyBackend(TestCase):
 
     def test_sanity(self):
-        api_key = mommy.make(
+        api_key = baker.make(
             'ievv_api_key.ScopedApiKey',
             base_jwt_payload={
                 'scope': ['read', 'write']
@@ -35,7 +35,7 @@ class TestApiKeyBackend(TestCase):
         self.assertEqual(decoded['scope'], ['read', 'write'])
 
     def test_fields_which_is_not_overridable_is_not_changed(self):
-        api_key = mommy.make(
+        api_key = baker.make(
             'ievv_api_key.ScopedApiKey',
             base_jwt_payload={
                 'exp': 123,
@@ -58,7 +58,7 @@ class TestApiKeyBackend(TestCase):
         self.assertEqual(decoded['api_key_id'], api_key.id)
 
     def test_verify_intercepted_payload_extend_expiration(self):
-        api_key = mommy.make(
+        api_key = baker.make(
             'ievv_api_key.ScopedApiKey',
             base_jwt_payload={
                 'scope': ['read', 'write']
@@ -83,7 +83,7 @@ class TestApiKeyBackend(TestCase):
             backend.decode(new_jwt, verify=True)
 
     def test_verify_intercepted_payload_added_additional_scope(self):
-        api_key = mommy.make(
+        api_key = baker.make(
             'ievv_api_key.ScopedApiKey',
             base_jwt_payload={
                 'scope': ['read', 'write']
@@ -108,7 +108,7 @@ class TestApiKeyBackend(TestCase):
             backend.decode(new_jwt, verify=True)
 
     def test_sign_jwt_with_another_secret(self):
-        api_key = mommy.make(
+        api_key = baker.make(
             'ievv_api_key.ScopedApiKey',
             base_jwt_payload={
                 'scope': ['read', 'write']
@@ -134,7 +134,7 @@ class TestApiKeyBackend(TestCase):
                     'ievv_auth.ievv_jwt.backends.api_key_backend.ApiKeyBackend.access_token_expiration',
                     new_callable=PropertyMock,
                     return_value=timezone.now() - timezone.timedelta(days=1)):
-                api_key = mommy.make(
+                api_key = baker.make(
                     'ievv_api_key.ScopedApiKey',
                     base_jwt_payload={
                         'scope': ['read', 'write']
@@ -149,7 +149,7 @@ class TestApiKeyBackend(TestCase):
                     backend.decode(jwt, verify=True)
 
     def test_make_instance_from_raw_jwt(self):
-        api_key = mommy.make(
+        api_key = baker.make(
             'ievv_api_key.ScopedApiKey',
             base_jwt_payload={
                 'scope': ['read', 'write']
@@ -168,7 +168,7 @@ class TestApiKeyBackend(TestCase):
             'ievv_auth.ievv_jwt.backends.api_key_backend.ApiKeyBackend.encode',
             return_value='test'
         ):
-            api_key = mommy.make(
+            api_key = baker.make(
                 'ievv_api_key.ScopedApiKey',
                 base_jwt_payload={
                     'scope': ['read', 'write']

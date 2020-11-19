@@ -1,7 +1,5 @@
 import re
 from django.conf import settings
-from django.contrib.postgres import fields as pg_fields
-from django.contrib.postgres.fields import JSONField
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.db import models
@@ -243,7 +241,7 @@ class ScopedAPIKey(AbstractAPIKey):
     )
 
     #: Should contain the payload of the jwt issued after authentication
-    base_jwt_payload = pg_fields.JSONField(
+    base_jwt_payload = models.JSONField(
         default=dict,
         null=False,
         blank=True
@@ -262,7 +260,7 @@ class ScopedAPIKey(AbstractAPIKey):
 
 class AbstractAuthenticationLog(models.Model):
     #: Log data contains authentication attempt message and auxiliary data
-    log_data = JSONField(null=True, blank=False, default=dict)
+    log_data = models.JSONField(null=True, blank=False, default=dict)
 
     #: created datetime
     created = models.DateTimeField(auto_now_add=True)

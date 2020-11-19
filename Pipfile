@@ -1,0 +1,22 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+psycopg2 = "*"
+Django = "*"
+ievv-opensource = "<7"
+PyJWT = "==1.7.1"
+python-dateutil = "*"
+djangorestframework = "*"
+cryptography = "==2.8"
+django-ipware = "==2.1.0"
+
+[dev-packages]
+model-bakery = "*"
+django-dbdev = "*"
+
+
+[requires]
+python_version = "3.8"

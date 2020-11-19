@@ -16,7 +16,7 @@ setup(
     license='BSD',
     url="https://github.com/appressoas/ievv_auth",
     install_requires=[
-        'Django',
+        'Django>=3',
         'PyJWT>=1.7.1',
         'djangorestframework',
         'psycopg2',

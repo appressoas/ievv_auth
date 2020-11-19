@@ -51,3 +51,9 @@ IEVV_JWT = {
     }
 }
 ```
+
+
+## Changelog
+
+### 2.0.0
+Django 3 support.

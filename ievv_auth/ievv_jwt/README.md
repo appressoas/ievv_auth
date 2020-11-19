@@ -69,8 +69,9 @@ class MyApiView(APIView):
 Simply add the api authentication view in urls.py
 ```python
 from ievv_auth.ievv_jwt.api.views import APIKeyObtainJWTAccessTokenView
-from django.conf.urls import url
+from django.urls import path
+
 urlpatterns = [
-    url(r'^api-key-auth', APIKeyObtainJWTAccessTokenView.as_view(), name='api-key-auth')
+    path('api-key-auth', APIKeyObtainJWTAccessTokenView.as_view(), name='api-key-auth')
 ]
 ```
