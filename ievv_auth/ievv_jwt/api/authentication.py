@@ -1,5 +1,6 @@
 from rest_framework import HTTP_HEADER_ENCODING, authentication
 from rest_framework.exceptions import AuthenticationFailed
+from django.utils.translation import gettext_lazy
 
 from ievv_auth.ievv_jwt.backends.backend_registry import get_backend_from_raw_jwt
 from ievv_auth.ievv_jwt.exceptions import JWTBackendError
@@ -73,7 +74,7 @@ class JWTAuthentication(authentication.BaseAuthentication):
 
         if len(parts) != 2:
             raise AuthenticationFailed(
-                _('Authorization header must contain two space-delimited values'),
+                gettext_lazy('Authorization header must contain two space-delimited values'),
                 code='bad_authorization_header',
             )
 
