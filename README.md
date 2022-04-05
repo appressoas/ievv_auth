@@ -60,3 +60,6 @@ Django 3 support.
 
 ### 2.0.1
 gettext translation fix.
+
+### 2.0.2
+add missing gettext translation fix

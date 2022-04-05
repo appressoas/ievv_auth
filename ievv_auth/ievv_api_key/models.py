@@ -3,7 +3,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.db import models
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import gettext_lazy
 from django.contrib.auth.hashers import check_password, make_password
 from django.utils.crypto import get_random_string
 
@@ -173,31 +173,31 @@ class AbstractAPIKey(models.Model):
         blank=True,
         default=None,
         null=True,
-        verbose_name=ugettext_lazy('Name'),
-        help_text=ugettext_lazy('Free text for the api key')
+        verbose_name=gettext_lazy('Name'),
+        help_text=gettext_lazy('Free text for the api key')
     )
 
     #: If the api key has been revoked
     revoked = models.BooleanField(
         default=False,
-        verbose_name=ugettext_lazy('Revoked'),
-        help_text=ugettext_lazy('If the api key has been revoked, once revoked it cannot be undone')
+        verbose_name=gettext_lazy('Revoked'),
+        help_text=gettext_lazy('If the api key has been revoked, once revoked it cannot be undone')
     )
 
     #: created datetime
     created = models.DateTimeField(
         auto_now_add=True,
         editable=False,
-        verbose_name=ugettext_lazy('Created datetime'),
-        help_text=ugettext_lazy('When the api key was created')
+        verbose_name=gettext_lazy('Created datetime'),
+        help_text=gettext_lazy('When the api key was created')
     )
 
     #: datetime when the key expires
     expiration_datetime = models.DateTimeField(
         blank=False,
         null=False,
-        verbose_name=ugettext_lazy('Expires'),
-        help_text=ugettext_lazy('The datetime when the token expires'),
+        verbose_name=gettext_lazy('Expires'),
+        help_text=gettext_lazy('The datetime when the token expires'),
         editable=False
     )
 
@@ -207,8 +207,8 @@ class AbstractAPIKey(models.Model):
 
     class Meta:
         abstract = True
-        verbose_name = ugettext_lazy('API key')
-        verbose_name_plural = ugettext_lazy('API keys')
+        verbose_name = gettext_lazy('API key')
+        verbose_name_plural = gettext_lazy('API keys')
 
     def log_authentication_attempt(self, log_data):
         raise NotImplementedError('Please implement logging_model_class')
@@ -223,7 +223,7 @@ class AbstractAPIKey(models.Model):
     def _validate_revoked(self):
         if self._initial_revoked and not self.revoked:
             raise ValidationError(
-                ugettext_lazy('Cannot set revoked to False once revoked')
+                gettext_lazy('Cannot set revoked to False once revoked')
             )
 
     def clean(self):
@@ -248,8 +248,8 @@ class ScopedAPIKey(AbstractAPIKey):
     )
 
     class Meta:
-        verbose_name = ugettext_lazy('Scoped api key')
-        verbose_name_plural = ugettext_lazy('Scoped api keys')
+        verbose_name = gettext_lazy('Scoped api key')
+        verbose_name_plural = gettext_lazy('Scoped api keys')
 
     def log_authentication_attempt(self, log_data):
         ScopedApiKeyAuthenticationLog.objects.create(api_key=self, log_data=log_data)
