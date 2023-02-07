@@ -10,7 +10,7 @@ ievv-opensource = "<7"
 PyJWT = "==1.7.1"
 python-dateutil = "*"
 djangorestframework = "*"
-cryptography = "==2.8"
+cryptography = "==39.0.1"
 django-ipware = "==2.1.0"
 
 [dev-packages]
