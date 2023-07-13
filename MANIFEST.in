@@ -1,4 +1,0 @@
-include README.md
-recursive-include ievv_auth *.md
-recursive-include ievv_auth *.json
-exclude development-environment.json

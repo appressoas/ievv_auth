@@ -43,3 +43,6 @@ ghostdriver.log
 develop-environment.json
 
 .vscode/
+.vscode-atest-temp/
+.venv/
+.python-version
