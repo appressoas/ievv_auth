@@ -83,9 +83,8 @@ Stop
 docker-compose down
 ```
 
-To wipe out the database, run:
+To wipe out the database, stop docker, delete database (dbdev.sqlite3) and run:
 ```bash
-docker-compose down -v
 docker-compose up
 python manage.py migrate
 python manage.py runserver
