@@ -71,6 +71,26 @@ set in pyproject.toml:
 pip install --upgrade --upgrade-strategy=eager ".[dev,test]"
 ```
 
+### Docker compose and runserver
+Start
+```bash
+docker-compose up
+python manage.py runserver
+```
+
+Stop
+```bash
+docker-compose down
+```
+
+To wipe out the database, run:
+```bash
+docker-compose down -v
+docker-compose up
+python manage.py migrate
+python manage.py runserver
+```
+
 ### Run tests
 ```bash
 source .venv/bin/activate   # enable virtualenv

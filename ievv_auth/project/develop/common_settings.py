@@ -1,13 +1,10 @@
 from ievv_auth.project.default.settings import *
 
-from django_dbdev.backends.postgres import DBSETTINGS
-
 
 DATABASES = {
-    'default': DBSETTINGS
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": "dbdev.sqlite3",
+    }
 }
 DATABASES['default']['PORT'] = 27253
-
-INSTALLED_APPS += [
-    'django_dbdev'
-]

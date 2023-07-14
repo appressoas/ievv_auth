@@ -33,9 +33,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = [
-    'django-dbdev',
-]
+dev = []
 
 test = [
     'model-bakery',
