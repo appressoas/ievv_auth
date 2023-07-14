@@ -1,3 +1,9 @@
+## 3.1.1 (2023-07-14)
+
+### Fix
+
+- **docker-compose**: correct database wipe info
+
 ## 3.1.0 (2023-07-14)
 
 ### Feat
