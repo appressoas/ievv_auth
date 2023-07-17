@@ -1,3 +1,9 @@
+## 3.1.2 (2023-07-17)
+
+### Fix
+
+- **docker-compose**: remove unneeded file
+
 ## 3.1.1 (2023-07-14)
 
 ### Fix
