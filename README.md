@@ -71,21 +71,14 @@ set in pyproject.toml:
 pip install --upgrade --upgrade-strategy=eager ".[dev,test]"
 ```
 
-### Docker compose and runserver
+### Runserver
 Start
 ```bash
-docker-compose up
 python manage.py runserver
 ```
 
-Stop
+To wipe out the database delete the database (dbdev.sqlite3) and run:
 ```bash
-docker-compose down
-```
-
-To wipe out the database, stop docker, delete database (dbdev.sqlite3) and run:
-```bash
-docker-compose up
 python manage.py migrate
 python manage.py runserver
 ```
@@ -93,11 +86,11 @@ python manage.py runserver
 ### Run tests
 ```bash
 source .venv/bin/activate   # enable virtualenv
-pytest ievv_opensource
+pytest ievv_auth
 ```
 
 
-## How to release ievv_opensource
+## How to release ievv_auth
 First make sure you have NO UNCOMITTED CHANGES!
 
 Release (create changelog, increment version, commit and tag the change) with:
