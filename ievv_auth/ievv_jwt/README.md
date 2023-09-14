@@ -16,7 +16,7 @@ class CustomJWTBackend(AbstractBackend):
 
     def make_payload(self):
         #: You can also override this function to make custom payload for JWT
-        payload = super(ApiKeyBackend, self).make_payload()
+        payload = super(CustomJWTBackend, self).make_payload()
         payload['some-key'] = 'Some value'
         return payload
     

@@ -19,7 +19,6 @@ ALLOWED_ALGORITHMS = [
 
 
 class AbstractBackend:
-
     @classmethod
     def get_backend_name(cls):
         raise NotImplementedError('Please implement get_backend_name')
@@ -64,14 +63,25 @@ class AbstractBackend:
         return timezone.now() + self.settings['ACCESS_TOKEN_LIFETIME']
 
     @property
+    def refresh_token_expiration(self):
+        if not self.settings['REFRESH_TOKEN_LIFETIME']:
+            return None
+        return timezone.now() + self.settings['REFRESH_TOKEN_LIFETIME']
+
+    @property
     def jti(self):
         return uuid4().hex
 
-    def make_payload(self, base_payload=None):
-        if not base_payload:
-            payload = {}
-        else:
-            payload = base_payload
+    def set_context(self, *args, **kwargs):
+        """
+        Should be overridden to set additional context
+        """
+        pass
+
+    def __make_access_token_payload(self, base_payload: dict | None = None) -> dict:
+        payload = self.make_access_token_payload()
+        if base_payload is not None:
+            payload.update(base_payload)
         if self.audience:
             payload['aud'] = self.audience
 
@@ -83,17 +93,46 @@ class AbstractBackend:
 
         payload['exp'] = self.access_token_expiration
         payload['iat'] = timezone.now()
+        payload[self.settings['TOKEN_TYPE_CLAIM']] = 'access'
         payload[self.settings['JTI_CLAIM']] = self.jti
         payload['jwt_backend_name'] = self.__class__.get_backend_name()
         return payload
 
-    def encode(self, base_payload=None):
+    def __make_refresh_token_payload(self, base_payload: dict | None = None) -> dict:
+        payload = self.make_refresh_token_payload()
+        if base_payload is not None:
+            payload.update(base_payload)
+        if self.audience:
+            payload['aud'] = self.audience
+
+        if self.issuer:
+            payload['iss'] = self.issuer
+
+        if self.subject:
+            payload['sub'] = self.subject
+
+        payload['exp'] = self.refresh_token_expiration
+        payload['iat'] = timezone.now()
+        payload[self.settings['TOKEN_TYPE_CLAIM']] = 'refresh'
+        payload[self.settings['JTI_CLAIM']] = self.jti
+        payload['jwt_backend_name'] = self.__class__.get_backend_name()
+        return payload
+
+    def encode_access_token(self, base_payload=None) -> str:
         token = jwt.encode(
-            self.make_payload(base_payload=base_payload),
+            self.__make_access_token_payload(base_payload=base_payload),
             self.signing_key,
             algorithm=self.algorithm
         )
-        return token.decode('utf-8')
+        return token
+
+    def encode_refresh_token(self, base_payload=None) -> str:
+        token = jwt.encode(
+            self.__make_refresh_token_payload(base_payload=base_payload),
+            self.signing_key,
+            algorithm=self.algorithm
+        )
+        return token
 
     def decode(self, token, verify=True):
         try:
@@ -103,11 +142,23 @@ class AbstractBackend:
         except InvalidTokenError:
             raise JWTBackendError('Token is invalid or expired')
 
-    def make_authenticate_success_response(self, *args, **kwargs):
+    def make_access_token_payload(self) -> dict:
         return {}
 
+    def make_refresh_token_payload(self) -> dict:
+        return {}
+
+    def make_authenticate_success_response(self, *args, access_token_payload: dict | None = None,
+                                           refresh_token_payload: dict | None = None, **kwargs) -> dict:
+        response = {
+            'access': self.encode_access_token(base_payload=access_token_payload)
+        }
+        if self.refresh_token_expiration is not None:
+            response['refresh'] = self.encode_refresh_token(base_payload=refresh_token_payload)
+        return response
+
     @classmethod
-    def make_instance_from_raw_jwt(cls, raw_jwt):
+    def make_instance_from_raw_jwt(cls, raw_jwt, use_context=False, *args, **kwargs) -> 'AbstractBackend':
         return cls()
 
 

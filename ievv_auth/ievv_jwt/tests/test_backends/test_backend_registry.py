@@ -38,7 +38,8 @@ class TestJWTBackendRegistry(TestCase):
             }
         )
         backend = ApiKeyBackend()
-        jwt = backend.encode()
+        backend.set_context(api_key_instance=api_key)
+        jwt = backend.encode_access_token()
         backend_class = get_backend_from_raw_jwt(raw_jwt=jwt)
         self.assertEqual(backend_class, ApiKeyBackend)
 

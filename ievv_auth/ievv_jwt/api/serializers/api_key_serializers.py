@@ -25,9 +25,5 @@ class ApiKeyObtainJWTSerializer(serializers.Serializer):
         if not jwt_backend_class:
             raise AuthenticationFailed('Unknown jwt backend could not authenticate')
         backend = jwt_backend_class()
-        return backend.make_authenticate_success_response(
-            base_payload={
-                **instance.base_jwt_payload,
-                'api_key_id': instance.id
-            }
-        )
+        backend.set_context(api_key_instance=instance)
+        return backend.make_authenticate_success_response()
