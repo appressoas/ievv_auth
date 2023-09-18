@@ -35,6 +35,10 @@ class AbstractBackend:
         return algorithm
 
     @property
+    def update_last_login(self):
+        return self.settings['UPDATE_LAST_LOGIN']
+
+    @property
     def signing_key(self):
         return self.settings['SIGNING_KEY']
 

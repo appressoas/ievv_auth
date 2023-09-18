@@ -4,7 +4,7 @@ from django.utils import timezone
 
 DEFAULT_SETTINGS = {
     'ACCESS_TOKEN_LIFETIME': timezone.timedelta(minutes=2),             # Access token lifetime
-    'REFRESH_TOKEN_LIFETIME': timezone.timedelta(days=1),               # Refresh token lifetime
+    'REFRESH_TOKEN_LIFETIME': timezone.timedelta(days=1),               # Refresh token lifetime if None refresh token is not issued
     'BLACKLIST_AFTER_ROTATION': True,                                   # Blacklist token after rotation
 
     'ALGORITHM': 'HS256',                                               # Algorithm
@@ -14,6 +14,7 @@ DEFAULT_SETTINGS = {
     'ISSUER': None,                                                     # Not mandatory issuer could be a url, domain, organization or person.
 
     'TOKEN_TYPE_CLAIM': 'token_type',                                   # Token type payload name
+    'UPDATE_LAST_LOGIN': True,                                          # Only used by user auth
 
     'JTI_CLAIM': 'jti',
 

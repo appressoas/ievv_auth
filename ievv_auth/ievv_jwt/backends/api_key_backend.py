@@ -39,7 +39,7 @@ class ApiKeyBackend(AbstractBackend):
     def make_instance_from_raw_jwt(cls, raw_jwt, use_context=False, *args, **kwargs):
         instance = cls()
         if use_context:
-            payload = instance.decode(raw_jwt, verify=False)
+            payload = instance.decode(raw_jwt)
             ScopedAPIKey = apps.get_model(app_label='ievv_auth.ievv_api_key', model_name='ScopedAPIKey')
             if 'api_key_id' not in payload:
                 raise JWTBackendError('JWT payload missing key "api_key_id"')
