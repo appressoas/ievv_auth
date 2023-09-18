@@ -69,6 +69,8 @@ class ApiKeyBackend(AbstractBackend):
                 raise JWTBackendError('JWT payload missing key "api_key_id"')
             try:
                 api_key_instance = ScopedAPIKey.objects.get(id=payload['api_key_id'])
+                if api_key_instance.has_expired or api_key_instance.revoked:
+                    raise JWTBackendError('API Key has expired or is revoked')
                 instance.set_context(api_key_instance=api_key_instance)
             except ScopedAPIKey.DoesNotExist:
                 raise JWTBackendError(f'No ScopedAPIKey with id "{payload["api_key_id"]}" found')

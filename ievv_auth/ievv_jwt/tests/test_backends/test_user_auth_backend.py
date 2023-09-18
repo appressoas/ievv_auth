@@ -257,6 +257,21 @@ class TestUserAuthBackend(TestCase):
                         {'access': 'access token', 'refresh': 'refresh token'}
                     )
 
+    def test_refresh_token_wrong_token_type(self):
+        with self.settings(IEVV_JWT={
+            'default': {
+                'REFRESH_TOKEN_LIFETIME': timezone.timedelta(days=1),
+                'USE_BLACKLIST': True,
+                'BLACKLIST_AFTER_ROTATION': True
+            }
+        }, INSTALLED_APPS=settings.INSTALLED_APPS_BLACKLIST):
+            user = baker.make(settings.AUTH_USER_MODEL)
+            backend = UserAuthBackend()
+            backend.set_context(user_instance=user)
+            token_pair = backend.make_authenticate_success_response()
+            with self.assertRaisesMessage(JWTBackendError, 'Token is not a refresh token'):
+                new_token_pair = backend.refresh(token=token_pair['access'])
+
     def test_make_authenticate_blacklist_not_installed_in_apps(self):
         with self.settings(IEVV_JWT={
             'default': {

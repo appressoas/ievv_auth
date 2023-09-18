@@ -519,6 +519,26 @@ class TestApiKeyBackend(TestCase):
             with self.assertRaisesMessage(JWTBackendError, 'Token is not valid'):
                 new_token_pair = backend.refresh(token=token_pair['refresh'])
 
+    def test_refresh_token_wrong_token_type(self):
+        with self.settings(IEVV_JWT={
+            'default': {
+                'REFRESH_TOKEN_LIFETIME': timezone.timedelta(days=1),
+                'USE_BLACKLIST': True,
+                'BLACKLIST_AFTER_ROTATION': True
+            }
+        }, INSTALLED_APPS=settings.INSTALLED_APPS_BLACKLIST):
+            api_key = baker.make(
+                'ievv_api_key.ScopedApiKey',
+                base_jwt_payload={
+                    'scope': ['read', 'write']
+                }
+            )
+            backend = ApiKeyBackend()
+            backend.set_context(api_key_instance=api_key)
+            token_pair = backend.make_authenticate_success_response()
+            with self.assertRaisesMessage(JWTBackendError, 'Token is not a refresh token'):
+                new_token_pair = backend.refresh(token=token_pair['access'])
+
     def test_refresh_request_token_has_expired(self):
         with self.settings(IEVV_JWT={
             'default': {

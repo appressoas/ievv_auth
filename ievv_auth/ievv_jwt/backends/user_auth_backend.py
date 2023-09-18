@@ -64,7 +64,9 @@ class UserAuthBackend(AbstractBackend):
                 raise JWTBackendError('JWT payload missing key "user_id"')
             try:
                 user_instance = UserModel.objects.get(id=payload['user_id'])
+                if not user_instance.is_active:
+                    raise JWTBackendError('Inactive User')
                 instance.set_context(user_instance=user_instance)
-            except UserModel.DoesNotExists:
+            except UserModel.DoesNotExist:
                 raise JWTBackendError(f'No user with id "{payload["user_id"]}" found')
         return instance
