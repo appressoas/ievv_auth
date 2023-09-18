@@ -5,7 +5,8 @@ from django.utils import timezone
 DEFAULT_SETTINGS = {
     'ACCESS_TOKEN_LIFETIME': timezone.timedelta(minutes=2),             # Access token lifetime
     'REFRESH_TOKEN_LIFETIME': timezone.timedelta(days=1),               # Refresh token lifetime if None refresh token is not issued
-    'BLACKLIST_AFTER_ROTATION': True,                                   # Blacklist token after rotation
+    'USE_BLACKLIST': True,                                              # Use the blacklist app, Default backend does not support blacklist
+    'BLACKLIST_AFTER_ROTATION': True,                                   # Blacklist token after rotation, Default backend does not support blacklist
 
     'ALGORITHM': 'HS256',                                               # Algorithm
     'SIGNING_KEY': settings.SECRET_KEY,                                 # Signing key

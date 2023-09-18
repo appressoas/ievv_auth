@@ -256,3 +256,171 @@ class TestUserAuthBackend(TestCase):
                         backend.make_authenticate_success_response(),
                         {'access': 'access token', 'refresh': 'refresh token'}
                     )
+
+    def test_make_authenticate_blacklist_not_installed_in_apps(self):
+        with self.settings(IEVV_JWT={
+            'default': {
+                'REFRESH_TOKEN_LIFETIME': timezone.timedelta(days=1),
+            }
+        }, INSTALLED_APPS=settings.INSTALLED_APPS_IEVV_JWT):
+            user = baker.make(settings.AUTH_USER_MODEL)
+            backend = UserAuthBackend()
+            backend.set_context(user_instance=user)
+            token_pair = backend.make_authenticate_success_response()
+            self.assertIn('access', token_pair)
+            self.assertIn('refresh', token_pair)
+            with self.settings(INSTALLED_APPS=settings.INSTALLED_APPS_BLACKLIST_AND_JWT):
+                self.assertEqual(backend.issued_token_model.objects.all().count(), 0)
+
+    def test_make_authenticate_blacklist_in_installed_apps_but_not_enabled(self):
+        with self.settings(IEVV_JWT={
+            'default': {
+                'REFRESH_TOKEN_LIFETIME': timezone.timedelta(days=1),
+                'USE_BLACKLIST': False
+            }
+        }, INSTALLED_APPS=settings.INSTALLED_APPS_BLACKLIST_AND_JWT):
+            user = baker.make(settings.AUTH_USER_MODEL)
+            backend = UserAuthBackend()
+            backend.set_context(user_instance=user)
+            token_pair = backend.make_authenticate_success_response()
+            self.assertIn('access', token_pair)
+            self.assertIn('refresh', token_pair)
+            self.assertEqual(backend.issued_token_model.objects.all().count(), 0)
+
+    def test_make_authenticate_blacklist_in_use(self):
+        with self.settings(IEVV_JWT={
+            'default': {
+                'REFRESH_TOKEN_LIFETIME': timezone.timedelta(days=1),
+                'USE_BLACKLIST': True
+            }
+        }, INSTALLED_APPS=settings.INSTALLED_APPS_BLACKLIST_AND_JWT):
+            user = baker.make(settings.AUTH_USER_MODEL)
+            backend = UserAuthBackend()
+            backend.set_context(user_instance=user)
+            token_pair = backend.make_authenticate_success_response()
+            self.assertIn('access', token_pair)
+            self.assertIn('refresh', token_pair)
+            refresh_jti = backend.decode(token_pair['refresh'])[backend.settings['JTI_CLAIM']]
+            IssuedTokenModel = backend.issued_token_model
+            self.assertEqual(IssuedTokenModel.objects.filter(jti=refresh_jti).count(), 1)
+
+    def test_refresh_toke_blacklist_not_in_installed_apps(self):
+        with self.settings(IEVV_JWT={
+            'default': {
+                'REFRESH_TOKEN_LIFETIME': timezone.timedelta(days=1),
+                'USE_BLACKLIST': True
+            }
+        }, INSTALLED_APPS=settings.INSTALLED_APPS_API_KEY):
+            user = baker.make(settings.AUTH_USER_MODEL)
+            backend = UserAuthBackend()
+            backend.set_context(user_instance=user)
+            token_pair = backend.make_authenticate_success_response()
+            new_token_pair = backend.refresh(token=token_pair['refresh'])
+            self.assertIn('access', new_token_pair)
+            self.assertIn('refresh', new_token_pair)
+            with self.settings(INSTALLED_APPS=settings.INSTALLED_APPS_BLACKLIST_AND_JWT):
+                self.assertEqual(backend.issued_token_model.objects.all().count(), 0)
+                self.assertEqual(backend.blacklisted_token_model.objects.all().count(), 0)
+            self.assertNotEqual(token_pair['access'], new_token_pair['access'])
+            self.assertNotEqual(token_pair['refresh'], new_token_pair['refresh'])
+
+    def test_refresh_token_blacklist_is_in_installed_apps_but_blacklist_is_disabled(self):
+        with self.settings(IEVV_JWT={
+            'default': {
+                'REFRESH_TOKEN_LIFETIME': timezone.timedelta(days=1),
+                'USE_BLACKLIST': False
+            }
+        }, INSTALLED_APPS=settings.INSTALLED_APPS_BLACKLIST_AND_JWT):
+            user = baker.make(settings.AUTH_USER_MODEL)
+            backend = UserAuthBackend()
+            backend.set_context(user_instance=user)
+            token_pair = backend.make_authenticate_success_response()
+            new_token_pair = backend.refresh(token=token_pair['refresh'])
+            self.assertIn('access', new_token_pair)
+            self.assertIn('refresh', new_token_pair)
+            with self.settings(INSTALLED_APPS=settings.INSTALLED_APPS_BLACKLIST_AND_JWT):
+                self.assertEqual(backend.issued_token_model.objects.all().count(), 0)
+                self.assertEqual(backend.blacklisted_token_model.objects.all().count(), 0)
+            self.assertNotEqual(token_pair['access'], new_token_pair['access'])
+            self.assertNotEqual(token_pair['refresh'], new_token_pair['refresh'])
+
+    def test_refresh_token_is_blacklisted(self):
+        with self.settings(IEVV_JWT={
+            'default': {
+                'REFRESH_TOKEN_LIFETIME': timezone.timedelta(days=1),
+                'USE_BLACKLIST': True
+            }
+        }, INSTALLED_APPS=settings.INSTALLED_APPS_BLACKLIST_AND_JWT):
+            user = baker.make(settings.AUTH_USER_MODEL)
+            backend = UserAuthBackend()
+            backend.set_context(user_instance=user)
+            token_pair = backend.make_authenticate_success_response()
+            refresh_jti = backend.decode(token_pair['refresh'])[backend.settings['JTI_CLAIM']]
+            IssuedTokenModel = backend.issued_token_model
+            BlacklistedTokenModel = backend.blacklisted_token_model
+            IssuedTokenModel.objects.get(jti=refresh_jti).blacklist_token()
+            self.assertEqual(BlacklistedTokenModel.objects.filter(token__jti=refresh_jti).count(), 1)
+            with self.assertRaisesMessage(JWTBackendError, 'Token is not valid'):
+                new_token_pair = backend.refresh(token=token_pair['refresh'])
+
+    def test_refresh_token_blacklist_on_rotation(self):
+        with self.settings(IEVV_JWT={
+            'default': {
+                'REFRESH_TOKEN_LIFETIME': timezone.timedelta(days=1),
+                'USE_BLACKLIST': True,
+                'BLACKLIST_AFTER_ROTATION': True
+            }
+        }, INSTALLED_APPS=settings.INSTALLED_APPS_BLACKLIST_AND_JWT):
+            user = baker.make(settings.AUTH_USER_MODEL)
+            backend = UserAuthBackend()
+            backend.set_context(user_instance=user)
+            token_pair = backend.make_authenticate_success_response()
+            refresh_jti = backend.decode(token_pair['refresh'])[backend.settings['JTI_CLAIM']]
+            IssuedTokenModel = backend.issued_token_model
+            BlacklistedTokenModel = backend.blacklisted_token_model
+            new_token_pair = backend.refresh(token=token_pair['refresh'])
+            self.assertEqual(BlacklistedTokenModel.objects.filter(token__jti=refresh_jti).count(), 1)
+
+    def test_refresh_token_blacklist_on_rotation_try_to_use_old(self):
+        with self.settings(IEVV_JWT={
+            'default': {
+                'REFRESH_TOKEN_LIFETIME': timezone.timedelta(days=1),
+                'USE_BLACKLIST': True,
+                'BLACKLIST_AFTER_ROTATION': True
+            }
+        }, INSTALLED_APPS=settings.INSTALLED_APPS_BLACKLIST_AND_JWT):
+            user = baker.make(settings.AUTH_USER_MODEL)
+            backend = UserAuthBackend()
+            backend.set_context(user_instance=user)
+            token_pair = backend.make_authenticate_success_response()
+            refresh_jti = backend.decode(token_pair['refresh'])[backend.settings['JTI_CLAIM']]
+            IssuedTokenModel = backend.issued_token_model
+            BlacklistedTokenModel = backend.blacklisted_token_model
+            new_token_pair = backend.refresh(token=token_pair['refresh'])
+            self.assertEqual(BlacklistedTokenModel.objects.filter(token__jti=refresh_jti).count(), 1)
+            with self.assertRaisesMessage(JWTBackendError, 'Token is not valid'):
+                new_token_pair = backend.refresh(token=token_pair['refresh'])
+
+    def test_refresh_request_token_has_expired(self):
+        with self.settings(IEVV_JWT={
+            'default': {
+                'REFRESH_TOKEN_LIFETIME': timezone.timedelta(days=1),
+                'USE_BLACKLIST': True
+            }
+        }, INSTALLED_APPS=settings.INSTALLED_APPS_BLACKLIST_AND_JWT):
+            with mock.patch(
+                    'ievv_auth.ievv_jwt.backends.user_auth_backend.UserAuthBackend.refresh_token_expiration',
+                    new_callable=PropertyMock,
+                    return_value=timezone.now() - timezone.timedelta(days=1)):
+                user = baker.make(settings.AUTH_USER_MODEL)
+                backend = UserAuthBackend()
+                backend.set_context(user_instance=user)
+                token_pair = backend.make_authenticate_success_response()
+                refresh_jti = py_jwt.decode(
+                    jwt=token_pair['refresh'],
+                    verify=False,
+                    options={'verify_signature': False}
+                )[backend.settings['JTI_CLAIM']]
+                IssuedTokenModel = backend.issued_token_model
+                with self.assertRaisesMessage(JWTBackendError, 'Token is invalid or expired'):
+                    backend.refresh(token=token_pair['refresh'])

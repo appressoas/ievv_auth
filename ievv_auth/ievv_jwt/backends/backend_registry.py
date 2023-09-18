@@ -27,5 +27,15 @@ class JWTBackendRegistry(Singleton):
 
 
 def get_backend_from_raw_jwt(raw_jwt) -> t.Type['AbstractBackend']:
+    """
+    Gets the backend from raw_jwt,
+    this step does not verify the jwt, it should happen later,
+    the only purpose is to get the backend class
+    Args:
+        raw_jwt: raw jwt string
+
+    Returns:
+        instance of AbstractBackend
+    """
     payload = jwt.decode(jwt=raw_jwt, verify=False, options={'verify_signature': False})
     return JWTBackendRegistry.get_instance().get_backend(payload['jwt_backend_name'])

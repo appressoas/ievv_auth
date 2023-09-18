@@ -5,7 +5,7 @@ from unittest import mock
 from unittest.mock import PropertyMock
 
 import jwt as py_jwt
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.utils import timezone
 
 from ievv_auth.ievv_jwt.backends.base_backend import BaseBackend
@@ -130,7 +130,7 @@ class TestBaseBackend(TestCase):
     def test_refresh_token_has_expired(self):
         with self.settings(IEVV_JWT={
             'default': {
-                'REFRESH_TOKEN_LIFETIME': timezone.timedelta(minutes=0),
+                'REFRESH_TOKEN_LIFETIME': timezone.timedelta(minutes=0)
             }
         }):
             with mock.patch(

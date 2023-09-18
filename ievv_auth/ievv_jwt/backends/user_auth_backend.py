@@ -1,11 +1,16 @@
-import jwt
+import typing as t
 
 from django.contrib.auth import get_user_model
+from django.apps import apps
 
 from ievv_auth.ievv_jwt.backends.base_backend import AbstractBackend
 from ievv_auth.ievv_jwt.exceptions import JWTBackendError
 
 UserModel = get_user_model()
+
+
+if t.TYPE_CHECKING:
+    from ievv_auth.ievv_jwt_blacklist.models import UserBlacklistedToken, UserIssuedToken
 
 
 class UserAuthBackend(AbstractBackend):
@@ -17,6 +22,24 @@ class UserAuthBackend(AbstractBackend):
 
     def set_context(self, user_instance: UserModel = None, *args, **kwargs):
         self.user_instance = user_instance
+
+    @property
+    def issued_token_model(self) -> t.Type['UserIssuedToken']:
+        return apps.get_model(app_label='ievv_jwt_blacklist', model_name='UserIssuedToken')
+
+    @property
+    def blacklisted_token_model(self) -> t.Type['UserBlacklistedToken']:
+        return apps.get_model(app_label='ievv_jwt_blacklist', model_name='UserBlacklistedToken')
+
+    def create_issued_token(self, token, payload, issued_at, expires_at, jti) -> 'UserBlacklistedToken':
+        return self.issued_token_model.objects.create(
+            issued_at=issued_at,
+            expires_at=expires_at,
+            token=token,
+            jti=jti,
+            token_payload=payload,
+            user=self.user_instance
+        )
 
     def make_access_token_payload(self) -> dict:
         if self.user_instance is None:
