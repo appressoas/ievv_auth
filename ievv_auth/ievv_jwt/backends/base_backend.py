@@ -177,8 +177,6 @@ class AbstractBackend:
             return token
 
         if self.blacklist_app in settings.INSTALLED_APPS and self.use_blacklist:
-            print('HELLO')
-            print(payload[self.settings['JTI_CLAIM']])
             self.create_issued_token(
                 token=token,
                 payload=json.dumps(payload, cls=DateTimeEncoder),
