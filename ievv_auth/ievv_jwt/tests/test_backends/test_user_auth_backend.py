@@ -264,7 +264,7 @@ class TestUserAuthBackend(TestCase):
                 'USE_BLACKLIST': True,
                 'BLACKLIST_AFTER_ROTATION': True
             }
-        }, INSTALLED_APPS=settings.INSTALLED_APPS_BLACKLIST):
+        }, INSTALLED_APPS=settings.INSTALLED_APPS_USER_BLACKLIST):
             user = baker.make(settings.AUTH_USER_MODEL)
             backend = UserAuthBackend()
             backend.set_context(user_instance=user)
@@ -284,7 +284,7 @@ class TestUserAuthBackend(TestCase):
             token_pair = backend.make_authenticate_success_response()
             self.assertIn('access', token_pair)
             self.assertIn('refresh', token_pair)
-            with self.settings(INSTALLED_APPS=settings.INSTALLED_APPS_BLACKLIST_AND_JWT):
+            with self.settings(INSTALLED_APPS=settings.INSTALLED_APPS_USER_BLACKLIST):
                 self.assertEqual(backend.issued_token_model.objects.all().count(), 0)
 
     def test_make_authenticate_blacklist_in_installed_apps_but_not_enabled(self):
@@ -293,7 +293,7 @@ class TestUserAuthBackend(TestCase):
                 'REFRESH_TOKEN_LIFETIME': timezone.timedelta(days=1),
                 'USE_BLACKLIST': False
             }
-        }, INSTALLED_APPS=settings.INSTALLED_APPS_BLACKLIST_AND_JWT):
+        }, INSTALLED_APPS=settings.INSTALLED_APPS_USER_BLACKLIST):
             user = baker.make(settings.AUTH_USER_MODEL)
             backend = UserAuthBackend()
             backend.set_context(user_instance=user)
@@ -308,7 +308,7 @@ class TestUserAuthBackend(TestCase):
                 'REFRESH_TOKEN_LIFETIME': timezone.timedelta(days=1),
                 'USE_BLACKLIST': True
             }
-        }, INSTALLED_APPS=settings.INSTALLED_APPS_BLACKLIST_AND_JWT):
+        }, INSTALLED_APPS=settings.INSTALLED_APPS_USER_BLACKLIST):
             user = baker.make(settings.AUTH_USER_MODEL)
             backend = UserAuthBackend()
             backend.set_context(user_instance=user)
@@ -333,7 +333,7 @@ class TestUserAuthBackend(TestCase):
             new_token_pair = backend.refresh(token=token_pair['refresh'])
             self.assertIn('access', new_token_pair)
             self.assertIn('refresh', new_token_pair)
-            with self.settings(INSTALLED_APPS=settings.INSTALLED_APPS_BLACKLIST_AND_JWT):
+            with self.settings(INSTALLED_APPS=settings.INSTALLED_APPS_USER_BLACKLIST):
                 self.assertEqual(backend.issued_token_model.objects.all().count(), 0)
                 self.assertEqual(backend.blacklisted_token_model.objects.all().count(), 0)
             self.assertNotEqual(token_pair['access'], new_token_pair['access'])
@@ -345,7 +345,7 @@ class TestUserAuthBackend(TestCase):
                 'REFRESH_TOKEN_LIFETIME': timezone.timedelta(days=1),
                 'USE_BLACKLIST': False
             }
-        }, INSTALLED_APPS=settings.INSTALLED_APPS_BLACKLIST_AND_JWT):
+        }, INSTALLED_APPS=settings.INSTALLED_APPS_USER_BLACKLIST):
             user = baker.make(settings.AUTH_USER_MODEL)
             backend = UserAuthBackend()
             backend.set_context(user_instance=user)
@@ -353,7 +353,7 @@ class TestUserAuthBackend(TestCase):
             new_token_pair = backend.refresh(token=token_pair['refresh'])
             self.assertIn('access', new_token_pair)
             self.assertIn('refresh', new_token_pair)
-            with self.settings(INSTALLED_APPS=settings.INSTALLED_APPS_BLACKLIST_AND_JWT):
+            with self.settings(INSTALLED_APPS=settings.INSTALLED_APPS_USER_BLACKLIST):
                 self.assertEqual(backend.issued_token_model.objects.all().count(), 0)
                 self.assertEqual(backend.blacklisted_token_model.objects.all().count(), 0)
             self.assertNotEqual(token_pair['access'], new_token_pair['access'])
@@ -365,7 +365,7 @@ class TestUserAuthBackend(TestCase):
                 'REFRESH_TOKEN_LIFETIME': timezone.timedelta(days=1),
                 'USE_BLACKLIST': True
             }
-        }, INSTALLED_APPS=settings.INSTALLED_APPS_BLACKLIST_AND_JWT):
+        }, INSTALLED_APPS=settings.INSTALLED_APPS_USER_BLACKLIST):
             user = baker.make(settings.AUTH_USER_MODEL)
             backend = UserAuthBackend()
             backend.set_context(user_instance=user)
@@ -385,7 +385,7 @@ class TestUserAuthBackend(TestCase):
                 'USE_BLACKLIST': True,
                 'BLACKLIST_AFTER_ROTATION': True
             }
-        }, INSTALLED_APPS=settings.INSTALLED_APPS_BLACKLIST_AND_JWT):
+        }, INSTALLED_APPS=settings.INSTALLED_APPS_USER_BLACKLIST):
             user = baker.make(settings.AUTH_USER_MODEL)
             backend = UserAuthBackend()
             backend.set_context(user_instance=user)
@@ -403,7 +403,7 @@ class TestUserAuthBackend(TestCase):
                 'USE_BLACKLIST': True,
                 'BLACKLIST_AFTER_ROTATION': True
             }
-        }, INSTALLED_APPS=settings.INSTALLED_APPS_BLACKLIST_AND_JWT):
+        }, INSTALLED_APPS=settings.INSTALLED_APPS_USER_BLACKLIST):
             user = baker.make(settings.AUTH_USER_MODEL)
             backend = UserAuthBackend()
             backend.set_context(user_instance=user)
@@ -422,7 +422,7 @@ class TestUserAuthBackend(TestCase):
                 'REFRESH_TOKEN_LIFETIME': timezone.timedelta(days=1),
                 'USE_BLACKLIST': True
             }
-        }, INSTALLED_APPS=settings.INSTALLED_APPS_BLACKLIST_AND_JWT):
+        }, INSTALLED_APPS=settings.INSTALLED_APPS_USER_BLACKLIST):
             with mock.patch(
                     'ievv_auth.ievv_jwt.backends.user_auth_backend.UserAuthBackend.refresh_token_expiration',
                     new_callable=PropertyMock,

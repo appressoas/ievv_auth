@@ -33,6 +33,9 @@ class AbstractIssuedToken(models.Model):
 class AbstractBlacklistedToken(models.Model):
     blacklisted_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        abstract = True
+
 
 class UserIssuedToken(AbstractIssuedToken):
     user = models.ForeignKey(
@@ -46,29 +49,5 @@ class UserIssuedToken(AbstractIssuedToken):
         return UserBlacklistedToken.objects.create(token=self)
 
 
-class ScopedApiKeyIssuedToken(AbstractIssuedToken):
-    scoped_api_key = models.ForeignKey(
-        'ievv_api_key.ScopedAPIKey',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True
-    )
-
-    class Meta:
-        #: is abstract when
-        abstract = 'ievv_auth.ievv_api_key' not in settings.INSTALLED_APPS
-
-    def blacklist_token(self) -> 'ScopedApiKeyBlacklistedToken':
-        return ScopedApiKeyBlacklistedToken.objects.create(token=self)
-
-
 class UserBlacklistedToken(AbstractBlacklistedToken):
     token = models.OneToOneField(UserIssuedToken, on_delete=models.SET_NULL, null=True, blank=True)
-
-
-class ScopedApiKeyBlacklistedToken(AbstractBlacklistedToken):
-    token = models.OneToOneField(ScopedApiKeyIssuedToken, on_delete=models.SET_NULL, null=True, blank=True)
-
-    class Meta:
-        #: is abstract when
-        abstract = 'ievv_auth.ievv_api_key' not in settings.INSTALLED_APPS

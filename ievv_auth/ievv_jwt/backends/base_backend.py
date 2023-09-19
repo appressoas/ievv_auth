@@ -36,6 +36,10 @@ class AbstractBackend:
         return load_settings(self.__class__.get_backend_name())
 
     @property
+    def blacklist_app(self):
+        return 'ievv_auth.ievv_jwt_blacklist'
+
+    @property
     def use_blacklist(self):
         return self.settings['USE_BLACKLIST']
 
@@ -164,7 +168,7 @@ class AbstractBackend:
             self.signing_key,
             algorithm=self.algorithm
         )
-        if 'ievv_auth.ievv_jwt_blacklist' not in settings.INSTALLED_APPS and \
+        if self.blacklist_app not in settings.INSTALLED_APPS and \
                 self.use_blacklist:
             logger.warning(
                 f'USE_BLACKLIST is: {self.use_blacklist} '
@@ -172,7 +176,7 @@ class AbstractBackend:
             )
             return token
 
-        if 'ievv_auth.ievv_jwt_blacklist' in settings.INSTALLED_APPS and self.use_blacklist:
+        if self.blacklist_app in settings.INSTALLED_APPS and self.use_blacklist:
             print('HELLO')
             print(payload[self.settings['JTI_CLAIM']])
             self.create_issued_token(
@@ -197,7 +201,7 @@ class AbstractBackend:
         jti = payload[self.settings['JTI_CLAIM']]
         if payload[self.settings['TOKEN_TYPE_CLAIM']] != 'refresh':
             raise JWTBackendError('Token is not a refresh token')
-        if 'ievv_auth.ievv_jwt_blacklist' not in settings.INSTALLED_APPS and \
+        if self.blacklist_app not in settings.INSTALLED_APPS and \
                 self.use_blacklist:
             logger.warning(
                 f'USE_BLACKLIST is: {self.use_blacklist} '

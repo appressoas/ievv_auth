@@ -48,15 +48,20 @@ INSTALLED_APPS_API_KEY = INSTALLED_APPS_IEVV_JWT + [
     'ievv_auth.ievv_api_key'
 ]
 
-INSTALLED_APPS_BLACKLIST = INSTALLED_APPS_API_KEY + [
+INSTALLED_APPS_API_KEY_BLACKLIST = INSTALLED_APPS_API_KEY + [
+    'ievv_auth.ievv_jwt_api_key_blacklist'
+]
+
+INSTALLED_APPS_USER_BLACKLIST = INSTALLED_APPS_IEVV_JWT + [
     'ievv_auth.ievv_jwt_blacklist'
 ]
 
-INSTALLED_APPS_BLACKLIST_AND_JWT = INSTALLED_APPS_IEVV_JWT + [
-    'ievv_auth.ievv_jwt_blacklist'
+INSTALLED_APPS = INSTALLED_APPS_DEFAULT + [
+    'ievv_auth.ievv_jwt',
+    'ievv_auth.ievv_api_key',
+    'ievv_auth.ievv_jwt_blacklist',
+    'ievv_auth.ievv_jwt_api_key_blacklist'
 ]
-
-INSTALLED_APPS = INSTALLED_APPS_BLACKLIST
 
 
 MIDDLEWARE = [

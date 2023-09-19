@@ -21,14 +21,17 @@ class ApiKeyBackend(AbstractBackend):
     def set_context(self, api_key_instance: 'ScopedAPIKey', *args, **kwargs):
         self.api_key_instance = api_key_instance
 
+    @property
+    def blacklist_app(self):
+        return 'ievv_auth.ievv_jwt_api_key_blacklist'
 
     @property
     def issued_token_model(self) -> t.Type['ScopedApiKeyIssuedToken']:
-        return apps.get_model(app_label='ievv_jwt_blacklist', model_name='ScopedApiKeyIssuedToken')
+        return apps.get_model(app_label='ievv_jwt_api_key_blacklist', model_name='ScopedApiKeyIssuedToken')
 
     @property
     def blacklisted_token_model(self) -> t.Type['ScopedApiKeyBlacklistedToken']:
-        return apps.get_model(app_label='ievv_jwt_blacklist', model_name='ScopedApiKeyBlacklistedToken')
+        return apps.get_model(app_label='ievv_jwt_api_key_blacklist', model_name='ScopedApiKeyBlacklistedToken')
 
     def create_issued_token(self, token, payload, issued_at, expires_at, jti) -> 'ScopedApiKeyIssuedToken':
         return self.issued_token_model.objects.create(

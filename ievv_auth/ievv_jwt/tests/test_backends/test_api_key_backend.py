@@ -352,7 +352,7 @@ class TestApiKeyBackend(TestCase):
             token_pair = backend.make_authenticate_success_response()
             self.assertIn('access', token_pair)
             self.assertIn('refresh', token_pair)
-            with self.settings(INSTALLED_APPS=settings.INSTALLED_APPS_BLACKLIST):
+            with self.settings(INSTALLED_APPS=settings.INSTALLED_APPS_API_KEY_BLACKLIST):
                 self.assertEqual(backend.issued_token_model.objects.all().count(), 0)
 
     def test_make_authenticate_blacklist_in_installed_apps_but_not_enabled(self):
@@ -361,7 +361,7 @@ class TestApiKeyBackend(TestCase):
                 'REFRESH_TOKEN_LIFETIME': timezone.timedelta(days=1),
                 'USE_BLACKLIST': False
             }
-        }, INSTALLED_APPS=settings.INSTALLED_APPS_BLACKLIST):
+        }, INSTALLED_APPS=settings.INSTALLED_APPS_API_KEY_BLACKLIST):
             api_key = baker.make(
                 'ievv_api_key.ScopedApiKey',
                 base_jwt_payload={
@@ -381,7 +381,7 @@ class TestApiKeyBackend(TestCase):
                 'REFRESH_TOKEN_LIFETIME': timezone.timedelta(days=1),
                 'USE_BLACKLIST': True
             }
-        }, INSTALLED_APPS=settings.INSTALLED_APPS_BLACKLIST):
+        }, INSTALLED_APPS=settings.INSTALLED_APPS_API_KEY_BLACKLIST):
             api_key = baker.make(
                 'ievv_api_key.ScopedApiKey',
                 base_jwt_payload={
@@ -416,7 +416,7 @@ class TestApiKeyBackend(TestCase):
             new_token_pair = backend.refresh(token=token_pair['refresh'])
             self.assertIn('access', new_token_pair)
             self.assertIn('refresh', new_token_pair)
-            with self.settings(INSTALLED_APPS=settings.INSTALLED_APPS_BLACKLIST):
+            with self.settings(INSTALLED_APPS=settings.INSTALLED_APPS_API_KEY_BLACKLIST):
                 self.assertEqual(backend.issued_token_model.objects.all().count(), 0)
                 self.assertEqual(backend.blacklisted_token_model.objects.all().count(), 0)
             self.assertNotEqual(token_pair['access'], new_token_pair['access'])
@@ -428,7 +428,7 @@ class TestApiKeyBackend(TestCase):
                 'REFRESH_TOKEN_LIFETIME': timezone.timedelta(days=1),
                 'USE_BLACKLIST': False
             }
-        }, INSTALLED_APPS=settings.INSTALLED_APPS_BLACKLIST):
+        }, INSTALLED_APPS=settings.INSTALLED_APPS_API_KEY_BLACKLIST):
             api_key = baker.make(
                 'ievv_api_key.ScopedApiKey',
                 base_jwt_payload={
@@ -441,7 +441,7 @@ class TestApiKeyBackend(TestCase):
             new_token_pair = backend.refresh(token=token_pair['refresh'])
             self.assertIn('access', new_token_pair)
             self.assertIn('refresh', new_token_pair)
-            with self.settings(INSTALLED_APPS=settings.INSTALLED_APPS_BLACKLIST):
+            with self.settings(INSTALLED_APPS=settings.INSTALLED_APPS_API_KEY_BLACKLIST):
                 self.assertEqual(backend.issued_token_model.objects.all().count(), 0)
                 self.assertEqual(backend.blacklisted_token_model.objects.all().count(), 0)
             self.assertNotEqual(token_pair['access'], new_token_pair['access'])
@@ -453,7 +453,7 @@ class TestApiKeyBackend(TestCase):
                 'REFRESH_TOKEN_LIFETIME': timezone.timedelta(days=1),
                 'USE_BLACKLIST': True
             }
-        }, INSTALLED_APPS=settings.INSTALLED_APPS_BLACKLIST):
+        }, INSTALLED_APPS=settings.INSTALLED_APPS_API_KEY_BLACKLIST):
             api_key = baker.make(
                 'ievv_api_key.ScopedApiKey',
                 base_jwt_payload={
@@ -478,7 +478,7 @@ class TestApiKeyBackend(TestCase):
                 'USE_BLACKLIST': True,
                 'BLACKLIST_AFTER_ROTATION': True
             }
-        }, INSTALLED_APPS=settings.INSTALLED_APPS_BLACKLIST):
+        }, INSTALLED_APPS=settings.INSTALLED_APPS_API_KEY_BLACKLIST):
             api_key = baker.make(
                 'ievv_api_key.ScopedApiKey',
                 base_jwt_payload={
@@ -501,7 +501,7 @@ class TestApiKeyBackend(TestCase):
                 'USE_BLACKLIST': True,
                 'BLACKLIST_AFTER_ROTATION': True
             }
-        }, INSTALLED_APPS=settings.INSTALLED_APPS_BLACKLIST):
+        }, INSTALLED_APPS=settings.INSTALLED_APPS_API_KEY_BLACKLIST):
             api_key = baker.make(
                 'ievv_api_key.ScopedApiKey',
                 base_jwt_payload={
@@ -526,7 +526,7 @@ class TestApiKeyBackend(TestCase):
                 'USE_BLACKLIST': True,
                 'BLACKLIST_AFTER_ROTATION': True
             }
-        }, INSTALLED_APPS=settings.INSTALLED_APPS_BLACKLIST):
+        }, INSTALLED_APPS=settings.INSTALLED_APPS_API_KEY_BLACKLIST):
             api_key = baker.make(
                 'ievv_api_key.ScopedApiKey',
                 base_jwt_payload={
@@ -545,7 +545,7 @@ class TestApiKeyBackend(TestCase):
                 'REFRESH_TOKEN_LIFETIME': timezone.timedelta(days=1),
                 'USE_BLACKLIST': True
             }
-        }, INSTALLED_APPS=settings.INSTALLED_APPS_BLACKLIST):
+        }, INSTALLED_APPS=settings.INSTALLED_APPS_API_KEY_BLACKLIST):
             with mock.patch(
                     'ievv_auth.ievv_jwt.backends.api_key_backend.ApiKeyBackend.refresh_token_expiration',
                     new_callable=PropertyMock,

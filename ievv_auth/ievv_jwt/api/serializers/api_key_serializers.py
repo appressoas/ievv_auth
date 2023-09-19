@@ -2,7 +2,7 @@ from ipware import get_client_ip
 from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed
 
-from ievv_auth.ievv_api_key.models import ScopedAPIKey
+from django.apps import apps
 from ievv_auth.ievv_jwt.backends.backend_registry import JWTBackendRegistry
 from ievv_auth.ievv_jwt.exceptions import JWTBackendError
 
@@ -13,6 +13,7 @@ class ApiKeyObtainJWTSerializer(serializers.Serializer):
     def validate(self, attrs):
         request = self.context.get("request")
         client_ip, is_routable = get_client_ip(request)
+        ScopedAPIKey = apps.get_model(app_label='ievv_api_key', model_name='ScopedAPIKey')
         is_valid, instance = ScopedAPIKey.objects.is_valid_with_logging(
             api_key=attrs['api_key'],
             extra={

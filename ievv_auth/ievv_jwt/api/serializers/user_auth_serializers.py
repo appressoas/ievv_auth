@@ -34,6 +34,8 @@ class UserAuthObtainJWTSerializer(serializers.Serializer):
             'password': attrs['password'],
             'request': self.context.get("request")
         }
+        print(authenticate_kwargs)
+        print(authenticate(**authenticate_kwargs))
         user_instance = authenticate(**authenticate_kwargs)
         if user_instance is None or not user_instance.is_active:
             raise AuthenticationFailed()
