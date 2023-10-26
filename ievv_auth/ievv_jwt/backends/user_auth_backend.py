@@ -10,7 +10,7 @@ UserModel = get_user_model()
 
 
 if t.TYPE_CHECKING:
-    from ievv_auth.ievv_jwt_blacklist.models import UserBlacklistedToken, UserIssuedToken
+    from ievv_auth.ievv_jwt_blacklist_user.models import UserBlacklistedToken, UserIssuedToken
 
 
 class UserAuthBackend(AbstractBackend):
@@ -25,11 +25,11 @@ class UserAuthBackend(AbstractBackend):
 
     @property
     def issued_token_model(self) -> t.Type['UserIssuedToken']:
-        return apps.get_model(app_label='ievv_jwt_blacklist', model_name='UserIssuedToken')
+        return apps.get_model(app_label='ievv_jwt_blacklist_user', model_name='UserIssuedToken')
 
     @property
     def blacklisted_token_model(self) -> t.Type['UserBlacklistedToken']:
-        return apps.get_model(app_label='ievv_jwt_blacklist', model_name='UserBlacklistedToken')
+        return apps.get_model(app_label='ievv_jwt_blacklist_user', model_name='UserBlacklistedToken')
 
     def create_issued_token(self, token, payload, issued_at, expires_at, jti) -> 'UserBlacklistedToken':
         return self.issued_token_model.objects.create(

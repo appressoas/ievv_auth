@@ -23,7 +23,7 @@ ALLOWED_ALGORITHMS = [
 ]
 
 if t.TYPE_CHECKING:
-    from ievv_auth.ievv_jwt_blacklist.models import AbstractBlacklistedToken, AbstractIssuedToken
+    from ievv_auth.ievv_jwt_blacklist_user.models import AbstractBlacklistedToken, AbstractIssuedToken
 
 
 class AbstractBackend:
@@ -37,7 +37,7 @@ class AbstractBackend:
 
     @property
     def blacklist_app(self):
-        return 'ievv_auth.ievv_jwt_blacklist'
+        return 'ievv_auth.ievv_jwt_blacklist_user'
 
     @property
     def use_blacklist(self):
@@ -172,7 +172,7 @@ class AbstractBackend:
                 self.use_blacklist:
             logger.warning(
                 f'USE_BLACKLIST is: {self.use_blacklist} '
-                f'while ievv_auth.ievv_jwt_blacklist is not in INSTALLED_APPS'
+                f'while ievv_auth.ievv_jwt_blacklist_user is not in INSTALLED_APPS'
             )
             return token
 
@@ -203,7 +203,7 @@ class AbstractBackend:
                 self.use_blacklist:
             logger.warning(
                 f'USE_BLACKLIST is: {self.use_blacklist} '
-                f'while ievv_auth.ievv_jwt_blacklist is not in INSTALLED_APPS'
+                f'while ievv_auth.ievv_jwt_blacklist_user is not in INSTALLED_APPS'
             )
             return self.make_authenticate_success_response()
         if self.use_blacklist and \

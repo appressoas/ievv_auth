@@ -1,6 +1,6 @@
 from django.db import models
 
-from ievv_auth.ievv_jwt_blacklist.models import AbstractIssuedToken, AbstractBlacklistedToken
+from ievv_auth.ievv_jwt_blacklist_core.models import AbstractIssuedToken, AbstractBlacklistedToken
 
 
 class ScopedApiKeyIssuedToken(AbstractIssuedToken):

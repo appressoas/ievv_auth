@@ -34,7 +34,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('blacklisted_at', models.DateTimeField(auto_now_add=True)),
-                ('token', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='ievv_jwt_blacklist.userissuedtoken')),
+                ('token', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='ievv_jwt_blacklist_user.userissuedtoken')),
             ],
             options={
                 'abstract': False,

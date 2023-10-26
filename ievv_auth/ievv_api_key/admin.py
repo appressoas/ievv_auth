@@ -15,6 +15,7 @@ class ScopedAPIKeyForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(ScopedAPIKeyForm, self).__init__(*args, **kwargs)
+        print(JWTBackendRegistry.get_instance().get_backend_choices())
         self.fields['jwt_backend_name'].choices = JWTBackendRegistry.get_instance().get_backend_choices()
 
     class Meta:

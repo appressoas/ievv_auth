@@ -10,7 +10,6 @@ API key format: `{prefix}.{secret}`
 * revoked: This field can be set to true to revoke the api key, after this is set to True it cannot be set to False again.
 * created: created datetime
 * expiration_datetime: expiration datetime, after this timestamp the api key cannot be used.
-* authentication_log: a json field for logging authentication attempts.
 
 ## ScopedAPIKey
 The intended use of the `ScopedAPIKey` model is together with jwt.

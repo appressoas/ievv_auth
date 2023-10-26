@@ -8,7 +8,7 @@ from django.apps import apps
 #: if typechecking
 if t.TYPE_CHECKING:
     from ievv_auth.ievv_api_key.models import ScopedAPIKey
-    from ievv_auth.ievv_jwt_blacklist.models import ScopedApiKeyIssuedToken, ScopedApiKeyBlacklistedToken
+    from ievv_auth.ievv_jwt_blacklist_user.models import ScopedApiKeyIssuedToken, ScopedApiKeyBlacklistedToken
 
 
 class ApiKeyBackend(AbstractBackend):
@@ -23,15 +23,15 @@ class ApiKeyBackend(AbstractBackend):
 
     @property
     def blacklist_app(self):
-        return 'ievv_auth.ievv_jwt_api_key_blacklist'
+        return 'ievv_auth.ievv_jwt_blacklist_api_key'
 
     @property
     def issued_token_model(self) -> t.Type['ScopedApiKeyIssuedToken']:
-        return apps.get_model(app_label='ievv_jwt_api_key_blacklist', model_name='ScopedApiKeyIssuedToken')
+        return apps.get_model(app_label='ievv_jwt_blacklist_api_key', model_name='ScopedApiKeyIssuedToken')
 
     @property
     def blacklisted_token_model(self) -> t.Type['ScopedApiKeyBlacklistedToken']:
-        return apps.get_model(app_label='ievv_jwt_api_key_blacklist', model_name='ScopedApiKeyBlacklistedToken')
+        return apps.get_model(app_label='ievv_jwt_blacklist_api_key', model_name='ScopedApiKeyBlacklistedToken')
 
     def create_issued_token(self, token, payload, issued_at, expires_at, jti) -> 'ScopedApiKeyIssuedToken':
         return self.issued_token_model.objects.create(

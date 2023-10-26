@@ -1,1 +1,0 @@
-default_app_config = 'ievv_auth.ievv_jwt_api_key_blacklist.apps.IevvJwtApiKeyBlacklistConfig'

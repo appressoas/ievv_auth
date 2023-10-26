@@ -1,5 +1,4 @@
 from django.db import models
-from django.conf import settings
 
 
 class AbstractIssuedToken(models.Model):
@@ -35,19 +34,3 @@ class AbstractBlacklistedToken(models.Model):
 
     class Meta:
         abstract = True
-
-
-class UserIssuedToken(AbstractIssuedToken):
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True
-    )
-
-    def blacklist_token(self) -> 'UserBlacklistedToken':
-        return UserBlacklistedToken.objects.create(token=self)
-
-
-class UserBlacklistedToken(AbstractBlacklistedToken):
-    token = models.OneToOneField(UserIssuedToken, on_delete=models.SET_NULL, null=True, blank=True)
