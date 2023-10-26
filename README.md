@@ -1,7 +1,7 @@
 # Ievv auth
 > Library for managing api keys and json web tokens
 
-## [Documentation and guides](docs)
+## [Documentation and guides](docs/index.md)
 
 ## Develop
 Requires:
