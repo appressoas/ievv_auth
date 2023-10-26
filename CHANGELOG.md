@@ -1,4 +1,9 @@
 ## 4.0.0 (2023-10-26)
+### Feature
+- username password backend
+- refresh token handling
+- blacklist apps for user auth and api key
+
 
 ## 4.0.0b1 (2023-09-19)
 
