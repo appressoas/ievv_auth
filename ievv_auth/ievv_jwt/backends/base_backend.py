@@ -114,7 +114,7 @@ class AbstractBackend:
     def create_issued_token(self, token, payload, issued_at, expires_at, jti) -> 'AbstractIssuedToken':
         raise NotImplementedError('Should implement create_issued_token')
 
-    def __make_access_token_payload(self, base_payload: typing.Union[dict | None] = None) -> dict:
+    def __make_access_token_payload(self, base_payload: typing.Union[dict, None] = None) -> dict:
         payload = self.make_access_token_payload()
         if base_payload is not None:
             payload.update(base_payload)
@@ -134,7 +134,7 @@ class AbstractBackend:
         payload['jwt_backend_name'] = self.__class__.get_backend_name()
         return payload
 
-    def __make_refresh_token_payload(self, base_payload: typing.Union[dict | None] = None) -> dict:
+    def __make_refresh_token_payload(self, base_payload: typing.Union[dict, None] = None) -> dict:
         payload = self.make_refresh_token_payload()
         if base_payload is not None:
             payload.update(base_payload)
