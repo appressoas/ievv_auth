@@ -1,3 +1,9 @@
+## 4.0.1 (2024-01-18)
+
+### Fix
+
+- **pyproject.toml**: remove psycopg2 dependency
+
 ## 4.0.0 (2023-10-26)
 ### Feature
 - username password backend

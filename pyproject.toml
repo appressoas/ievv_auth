@@ -55,7 +55,7 @@ exclude = []
 
 [tool.commitizen]
 name = "cz_conventional_commits"
-version = "4.0.0"
+version = "4.0.1"
 version_files = [
     "ievv_auth/__init__.py:__version__"
 ]
