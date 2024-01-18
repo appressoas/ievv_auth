@@ -1,16 +1,17 @@
-import typing as t
 import json
-
-from uuid import uuid4
 import logging
+import typing
+from uuid import uuid4
+
 import jwt
+from django.conf import settings
 from django.utils import timezone
 from django.utils.functional import cached_property
-from django.conf import settings
-from jwt import InvalidTokenError, ExpiredSignatureError
+from jwt import InvalidTokenError
 
 from ievv_auth.ievv_jwt.exceptions import JWTBackendError
-from ievv_auth.ievv_jwt.utils import load_settings, DateTimeEncoder
+from ievv_auth.ievv_jwt.utils import DateTimeEncoder, load_settings
+
 logger = logging.Logger(__name__)
 
 ALLOWED_ALGORITHMS = [
@@ -22,8 +23,8 @@ ALLOWED_ALGORITHMS = [
     'RS512',
 ]
 
-if t.TYPE_CHECKING:
-    from ievv_auth.ievv_jwt_blacklist_user.models import AbstractBlacklistedToken, AbstractIssuedToken
+if typing.TYPE_CHECKING:
+    from ievv_auth.ievv_jwt_blacklist_user.models import AbstractIssuedToken
 
 
 class AbstractBackend:
@@ -103,17 +104,17 @@ class AbstractBackend:
         pass
 
     @property
-    def issued_token_model(self) -> t.Type['AbstractIssuedToken']:
+    def issued_token_model(self) -> typing.Type['AbstractIssuedToken']:
         raise NotImplementedError('Should implement property issued_token_model')
 
     @property
-    def blacklisted_token_model(self) -> t.Type['AbstractBlacklistedToken']:
+    def blacklisted_token_model(self) -> typing.Type['AbstractBlacklistedToken']:
         raise NotImplementedError('Should implement property blacklisted_token_model')
 
     def create_issued_token(self, token, payload, issued_at, expires_at, jti) -> 'AbstractIssuedToken':
         raise NotImplementedError('Should implement create_issued_token')
 
-    def __make_access_token_payload(self, base_payload: dict | None = None) -> dict:
+    def __make_access_token_payload(self, base_payload: typing.Union[dict | None] = None) -> dict:
         payload = self.make_access_token_payload()
         if base_payload is not None:
             payload.update(base_payload)
@@ -133,7 +134,7 @@ class AbstractBackend:
         payload['jwt_backend_name'] = self.__class__.get_backend_name()
         return payload
 
-    def __make_refresh_token_payload(self, base_payload: dict | None = None) -> dict:
+    def __make_refresh_token_payload(self, base_payload: typing.Union[dict | None] = None) -> dict:
         payload = self.make_refresh_token_payload()
         if base_payload is not None:
             payload.update(base_payload)
