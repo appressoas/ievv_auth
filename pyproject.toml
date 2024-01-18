@@ -27,7 +27,6 @@ dependencies = [
     "django-ipware==2.1.0",
     "djangorestframework",
     "ievv_opensource>=9.2.2,<10.0.0",
-    "psycopg2",
     "PyJWT==2.8.0",
     "python-dateutil",
 ]
