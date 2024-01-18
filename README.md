@@ -119,8 +119,10 @@ git push && git push --tags
 See _How to revert a bump_ in the [commitizen FAQ](https://commitizen-tools.github.io/commitizen/faq/#how-to-revert-a-bump).
 
 ### Release to pypi:
+Pypi now require a token for login, go to [pypi](https://pypi.org/manage/account/token/) and create a token. You will be promted to enter this after running publish below.
+
 ```bash
 hatch build -t sdist
-hatch publish
+hatch publish -u __token__
 rm dist/*              # optional cleanup
 ```
