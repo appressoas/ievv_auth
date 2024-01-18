@@ -1,3 +1,9 @@
+## 4.0.3 (2024-01-18)
+
+### Fix
+
+- **typing**: correct union syntax
+
 ## 4.0.2 (2024-01-18)
 
 ### Fix
