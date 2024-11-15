@@ -23,10 +23,9 @@ classifiers = [
 
 dependencies = [
     "cryptography",
-    "Django>=4.0.0,<5.0.0",
+    "Django>=4.0.0,<6.0.0",
     "django-ipware==2.1.0",
     "djangorestframework",
-    "ievv_opensource>=9.2.2,<10.0.0",
     "PyJWT==2.8.0",
     "python-dateutil",
 ]

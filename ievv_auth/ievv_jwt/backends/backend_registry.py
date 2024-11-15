@@ -1,7 +1,7 @@
 import typing as t
 
 import jwt
-from ievv_opensource.utils.singleton import Singleton
+from ievv_auth.ievv_jwt.utils.singleton import Singleton
 
 if t.TYPE_CHECKING:
     from .base_backend import AbstractBackend
