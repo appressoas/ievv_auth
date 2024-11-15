@@ -126,3 +126,34 @@ hatch build -t sdist
 hatch publish -u __token__
 rm dist/*              # optional cleanup
 ```
+
+#### Setup .pypirc with token
+Create the token as above
+
+*Make/open .pypirc file*
+```bash
+vim ~/.pypirc
+```
+
+*Insert this*
+```text
+[distutils]
+index-servers =
+    pypi
+
+[pypi]
+repository = https://upload.pypi.org/legacy/
+username = __token__
+password = <your-token>
+```
+
+*Set permission for file*
+Makes sure noe one else can read your file :).
+```bash
+chmod 600 ~/.pypirc
+```
+
+*Release*
+```bash
+hatch publish
+```
